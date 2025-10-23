@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>New Patient Results Module</title>
+  <meta name="description" content="New Patient Results Module" />
+  <meta name="author" content="The Practice - Development Team" />
+
+  <!-- Google Fonts -->
+  <link
+    rel="stylesheet"
+    href="//fonts.googleapis.com/css?family=Lato:300,400,700,900,300italic,400italic,700italic,900italic"
+  />
+
+  <!-- Minified CSS Bundle -->
+  <link
+    rel="stylesheet"
+    href="https://members.mypgi.com/min/g=si-ms-css?v=0.62"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://kit.fontawesome.com/425aa9ca2c.css"
+    crossorigin="anonymous"
+  />
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles/styles.css" />
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container-fluid">
+      <h1>Header</h1>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Left Column: New Patient Results -->
+        <div class="col-lg-6 col-md-12">
+          <section class="results-panel">
+            <!-- Panel Header -->
+            <div class="panel-header">
+              <h2 class="panel-title">New Patient Results</h2>
+              <div class="panel-actions">
+                <button class="btn-icon" title="Table View">
+                  <i class="fas fa-table"></i> Table
+                </button>
+                <button class="btn-icon" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Time Period Tabs -->
+            <div class="time-period-tabs">
+              <button class="tab-btn">Monthly</button>
+              <button class="tab-btn">Quarterly</button>
+              <button class="tab-btn active">Yearly</button>
+              <button class="tab-btn">Total</button>
+              <button class="tab-btn">X Years</button>
+            </div>
+
+            <!-- Data Table -->
+            <div class="data-table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th class="col-location">
+                      <i class="fas fa-map-marker-alt"></i> Locations
+                    </th>
+                    <th class="col-start-avg">
+                      <i class="fas fa-chart-line"></i> Start Avg.
+                    </th>
+                    <th class="col-new-avg">New Avg.</th>
+                    <th class="col-growth">
+                      <i class="fas fa-arrow-up"></i> Growth
+                    </th>
+                    <th class="col-revenue">
+                      <i class="fas fa-dollar-sign"></i> Avg. Revenue / N.P.
+                    </th>
+                    <th class="col-growth-total">
+                      <i class="fas fa-chart-bar"></i> Growth Total
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="location-name">Bradley Place</td>
+                    <td>324</td>
+                    <td>421</td>
+                    <td>97 <span class="growth-percent">(30%)</span></td>
+                    <td>$2,978</td>
+                    <td class="growth-total">$288,866</td>
+                  </tr>
+                  <tr>
+                    <td class="location-name">East Lake</td>
+                    <td>445</td>
+                    <td>508</td>
+                    <td>153 <span class="growth-percent">(34%)</span></td>
+                    <td>$2,101</td>
+                    <td class="growth-total">$321,453</td>
+                  </tr>
+                  <tr>
+                    <td class="location-name">Fullerton</td>
+                    <td>275</td>
+                    <td>265</td>
+                    <td>0</td>
+                    <td>$2,457</td>
+                    <td class="growth-total">$0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Investment and Return Cards -->
+            <div class="metrics-cards">
+              <div class="metric-card investment-card">
+                <div class="card-header">
+                  <h3>Investment <i class="fas fa-info-circle"></i></h3>
+                  <span class="date-range">Aug 24 - Jul 25</span>
+                </div>
+                <div class="card-value">$14,587 <span class="period">/year</span></div>
+                <div class="card-breakdown">
+                  <span class="breakdown-item">$9,798</span>
+                  <span class="breakdown-operator">+</span>
+                  <span class="breakdown-item">$4,789</span>
+                </div>
+              </div>
+
+              <div class="metric-card return-card">
+                <div class="card-header">
+                  <h3>Return <i class="fas fa-info-circle"></i></h3>
+                  <span class="date-range">Aug 24 - Jul 25</span>
+                </div>
+                <div class="card-value">$610,339 <span class="period">/year</span></div>
+                <div class="card-breakdown">
+                  <span class="breakdown-item">250</span>
+                </div>
+              </div>
+            </div>
+
+          </section>
+        </div>
+
+        <!-- Right Column: Quick Links -->
+        <div class="col-lg-6 col-md-12">
+          <aside class="quick-links-panel">
+            <h3>Quick links section</h3>
+            <!-- Quick links content will go here -->
+          </aside>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://members.mypgi.com/min/g=new-ms-js?v=0.62"></script>
+</body>
+</html>
