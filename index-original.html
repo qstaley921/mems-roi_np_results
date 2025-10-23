@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    body {
+      padding: 1rem;
+      margin: 0;
+      transition: opacity ease-in 0.2s;
+    }
+    body[unresolved] {
+      opacity: 0;
+      display: block;
+      overflow: hidden;
+      position: relative;
+    }
+    main {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(auto, 500px));
+      gap: 1rem;
+      max-width: 1020px;
+      margin: 0 auto;
+    }
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>The Practice Growth Institute Membersite</title>
+  <meta content="The Practice Growth Institute Membersite" name="description" />
+  <meta content="The Practice - Development Team" name="author" />
+
+  <!-- Mobile Device Meta Info -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+  <meta name="application-name" content="NPIMembers" />
+  <meta name="apple-mobile-web-app-title" content="NPIMembers" />
+  <link
+    rel="apple-touch-icon"
+    href="/shortcut_img/npi_logo_touch-icon-iphone-retina.png"
+  />
+  <link
+    rel="apple-touch-icon"
+    sizes="152x152"
+    href="/shortcut_img/npi_logo_touch-icon-ipad.png"
+  />
+  <link
+    rel="apple-touch-icon"
+    sizes="180x180"
+    href="/shortcut_img/npi_logo_touch-icon-iphone-retina.png"
+  />
+  <link
+    rel="apple-touch-icon"
+    sizes="167x167"
+    href="/shortcut_img/npi_logo_touch-icon-ipad-retina.png"
+  />
+  <link
+    rel="apple-touch-startup-image"
+    href="/shortcut_img/npi_logo_touch-icon-iphone-retina.png"
+  />
+  <link
+    rel="stylesheet"
+    href="//fonts.googleapis.com/css?family=Lato:300,400,700,900,300italic,400italic,700italic,900italic"
+  />
+  <link rel="stylesheet" href="styles.css" />
+  <style type="text/css">
+    :root {
+      --brand-main: #414141;
+      --brand-main-90: rgba(65, 65, 65, 0.9);
+      --brand-main-80: rgba(65, 65, 65, 0.8);
+      --brand-main-70: rgba(65, 65, 65, 0.7);
+      --brand-main-60: rgba(65, 65, 65, 0.6);
+      --brand-main-50: rgba(65, 65, 65, 0.5);
+      --brand-main-40: rgba(65, 65, 65, 0.4);
+      --brand-main-30: rgba(65, 65, 65, 0.3);
+      --brand-main-20: rgba(65, 65, 65, 0.2);
+      --brand-main-10: rgba(65, 65, 65, 0.1);
+      --brand-second: #000000;
+      --brand-second-90: rgba(0, 0, 0, 0.9);
+      --brand-second-80: rgba(0, 0, 0, 0.8);
+      --brand-second-70: rgba(0, 0, 0, 0.7);
+      --brand-second-60: rgba(0, 0, 0, 0.6);
+      --brand-second-50: rgba(0, 0, 0, 0.5);
+      --brand-second-40: rgba(0, 0, 0, 0.4);
+      --brand-second-30: rgba(0, 0, 0, 0.3);
+      --brand-second-20: rgba(0, 0, 0, 0.2);
+      --brand-second-10: rgba(0, 0, 0, 0.1);
+      --brand-third: #000000;
+      --brand-third-90: rgba(0, 0, 0, 0.9);
+      --brand-third-80: rgba(0, 0, 0, 0.8);
+      --brand-third-70: rgba(0, 0, 0, 0.7);
+      --brand-third-60: rgba(0, 0, 0, 0.6);
+      --brand-third-50: rgba(0, 0, 0, 0.5);
+      --brand-third-40: rgba(0, 0, 0, 0.4);
+      --brand-third-30: rgba(0, 0, 0, 0.3);
+      --brand-third-20: rgba(0, 0, 0, 0.2);
+      --brand-third-10: rgba(0, 0, 0, 0.1);
+      --brand-fourth: #ed1c24;
+      --brand-fourth-90: rgba(237, 28, 36, 0.9);
+      --brand-fourth-80: rgba(237, 28, 36, 0.8);
+      --brand-fourth-70: rgba(237, 28, 36, 0.7);
+      --brand-fourth-60: rgba(237, 28, 36, 0.6);
+      --brand-fourth-50: rgba(237, 28, 36, 0.5);
+      --brand-fourth-40: rgba(237, 28, 36, 0.4);
+      --brand-fourth-30: rgba(237, 28, 36, 0.3);
+      --brand-fourth-20: rgba(237, 28, 36, 0.2);
+      --brand-fourth-10: rgba(237, 28, 36, 0.1);
+      --brand-fifth: #b1b1b1;
+      --brand-fifth-90: rgba(177, 177, 177, 0.9);
+      --brand-fifth-80: rgba(177, 177, 177, 0.8);
+      --brand-fifth-70: rgba(177, 177, 177, 0.7);
+      --brand-fifth-60: rgba(177, 177, 177, 0.6);
+      --brand-fifth-50: rgba(177, 177, 177, 0.5);
+      --brand-fifth-40: rgba(177, 177, 177, 0.4);
+      --brand-fifth-30: rgba(177, 177, 177, 0.3);
+      --brand-fifth-20: rgba(177, 177, 177, 0.2);
+      --brand-fifth-10: rgba(177, 177, 177, 0.1);
+      --brand-sixth: #e8e8e8;
+      --brand-sixth-90: rgba(232, 232, 232, 0.9);
+      --brand-sixth-80: rgba(232, 232, 232, 0.8);
+      --brand-sixth-70: rgba(232, 232, 232, 0.7);
+      --brand-sixth-60: rgba(232, 232, 232, 0.6);
+      --brand-sixth-50: rgba(232, 232, 232, 0.5);
+      --brand-sixth-40: rgba(232, 232, 232, 0.4);
+      --brand-sixth-30: rgba(232, 232, 232, 0.3);
+      --brand-sixth-20: rgba(232, 232, 232, 0.2);
+      --brand-sixth-10: rgba(232, 232, 232, 0.1);
+      --brand-gray-base: #919191;
+      --brand-success: #146b1a;
+      --brand-info: #104861;
+      --brand-warning: #e8af00;
+      --brand-danger: #ae1c24;
+    }
+  </style>
+  <style>
+    .pw_parent {
+        position: relative;
+    }
+    .pw_child{
+        position: absolute;
+        background-color: gray;
+        font-size: 1.2em;
+        top: 0em;
+        width:100%;
+        text-align:center;
+        color:white;
+        font-weight:400;
+        z-index:1;
+        padding:.5em
+        display:iblock;
+        /*display:none;*/
+    }
+  </style>
+
+  <link
+    rel="stylesheet"
+    href="https://members.mypgi.com/min/g=si-ms-css?v=0.62"
+  />
+  <!-- BEGIN SCRIPTS -->
+  <!-- SHOULD BE FIRST JS THAT RUNS just logged in js -->
+  <script
+    type="text/javascript"
+    async=""
+    src="https://www.google-analytics.com/analytics.js"
+  ></script>
+  <script
+    type="text/javascript"
+    async=""
+    src="https://www.googletagmanager.com/gtag/js?id=G-ZCZSD937K0&amp;cx=c&amp;gtm=4e5al1"
+  ></script>
+  <script type="text/javascript">
+    if (
+      document.cookie.split(";").filter(function (item) {
+        // if just logged in cookie is not set, then set it to 'yes'
+        return (session_cookie = item.indexOf("just_logged_in") >= 0);
+      }).length
+    ) {
+      //document.cookie = 'just_logged_in=no;path=/';
+    } else {
+      document.cookie = "just_logged_in=yes;path=/";
+    }
+  </script>
+
+  <!-- Install Hotjar Tracking Code -->
+  <script>
+    (function (c, s, q, u, a, r, e) {
+      c.hj =
+        c.hj ||
+        function () {
+          (c.hj.q = c.hj.q || []).push(arguments);
+        };
+      c._hjSettings = { hjid: a };
+      r = s.getElementsByTagName("head")[0];
+      e = s.createElement("script");
+      e.async = true;
+      e.src = q + c._hjSettings.hjid + u;
+      r.appendChild(e);
+    })(
+      window,
+      document,
+      "https://static.hj.contentsquare.net/c/csq-",
+      ".js",
+      6417556
+    );
+  </script>
+  <script
+    async=""
+    src="https://static.hj.contentsquare.net/c/csq-6417556.js"
+  ></script>
+
+  <!-- adding global javascript variables -->
+  <script type="text/javascript">
+    var envConfig = {
+      si_cookie_dom: ".mypgi.com",
+      simembers_url: "https:\/\/members.mypgi.com",
+      simembers_old_url: "https:\/\/www.simembers.com",
+    };
+    var just_logged_in = Boolean(
+      document.cookie.split(";").filter(function (item) {
+        return (session_cookie = item.indexOf("just_logged_in=yes") >= 0);
+      }).length
+    );
+  </script>
+
+  <!-- js versioning variable to help clients browsers download new js (change version when adding/updating js) -->
+
+  <!-- OLD IE PLUGINS -->
+  <!--[if lt IE 9]>
+    <script src="https://members.mypgi.com/min/g=new-ms-js-ie-fix"></script
+  ><![endif]-->
+
+  <!-- minified and combined js -->
+  <script src="https://members.mypgi.com/min/g=new-ms-js?v=0.62"></script>
+  <!-- load font awesome outside of min -->
+  <link
+    rel="stylesheet"
+    href="https://kit.fontawesome.com/425aa9ca2c.css"
+    crossorigin="anonymous"
+  />
+  <style media="all" id="fa-kit-upload"></style>
+  <style media="all" id="fa-v4-font-face">
+
+  <script>
+    function removeQueryParamFromCurrentUrl(param) {
+      let url = new URL(window.location);
+      url.searchParams.delete(param);
+
+      let newUrl = url.pathname + url.search;
+      history.replaceState(null, null, newUrl);
+    }
+  </script>
+
+  <script type="text/javascript">
+    /***********  SI INTERNAL QUICK NAV ******************/
+    var QuickNav = (function () {
+      return {
+        init: function () {
+          if ($(".quick-nav").length > 0) {
+            var stretchyNavs = $(".quick-nav");
+            stretchyNavs.each(function () {
+              var stretchyNav = $(this),
+                stretchyNavTrigger = stretchyNav.find(".quick-nav-trigger");
+
+              stretchyNavTrigger.on("click", function (event) {
+                event.preventDefault();
+                stretchyNav.toggleClass("nav-is-visible");
+              });
+            });
+
+            $(document).on("click", function (event) {
+              !$(event.target).is(".quick-nav-trigger") &&
+                !$(event.target).is(".quick-nav-trigger span") &&
+                stretchyNavs.removeClass("nav-is-visible");
+            });
+          }
+        },
+      };
+    })();
+
+    $(function () {
+      /***********  TOGGLE SWITCH - used for RSVP ******************/
+      $(".make-switch").bootstrapSwitch();
+
+      /***********  Stacktable and Cardtable ******************/
+      $(".stacktable").stacktable();
+      $(".cardtable").cardtable();
+
+      /***********  UNIVERSAL AJAX MODALS ******************/
+      var $modalSm = $("#ajax-modal-sm");
+      $(".ajax-modal-trigger-sm").on("click", function () {
+        $modalSm.empty();
+
+        $("body").modalmanager("loading");
+
+        var _this = this;
+
+        setTimeout(function () {
+          $modalSm.load($(_this).attr("data-url"), "", function () {
+            $modalSm.modal();
+          });
+        }, 1000);
+      });
+      //remove ajax modal html when modal is hidden
+      $(document).on("hidden.bs.modal", "#ajax-modal-sm", function () {
+        $("#ajax-modal-sm").html("");
+      });
+
+      var $modal = $("#ajax-modal");
+      $(".ajax-modal-trigger").on("click", function () {
+        $modal.empty();
+
+        $("body").modalmanager("loading");
+
+        var _this = this;
+
+        setTimeout(function () {
+          $modal.load($(_this).attr("data-url"), "", function () {
+            $modal.modal();
+          });
+        }, 1000);
+      });
+      // show modal if url has a GET parameter like nav-to-modal=url
+      var queryDict = {};
+      document.location.search
+        .substr(1)
+        .split("&")
+        .forEach(function (item) {
+          queryDict[item.split("=")[0]] = item.split("=")[1];
+        });
+      if (queryDict["nav-to-modal"]) {
+        $modal.load(
+          decodeURIComponent(queryDict["nav-to-modal"]),
+          "",
+          function () {
+            $modal.modal();
+          }
+        );
+        removeQueryParamFromCurrentUrl("nav-to-modal");
+      }
+      // remove view_admin_page from url get parameters if it exists
+      if (queryDict["view_admin_page"]) {
+        removeQueryParamFromCurrentUrl("view_admin_page");
+      }
+      //remove ajax modal html when modal is hidden
+      $(document).on("hidden.bs.modal", "#ajax-modal", function () {
+        $("#ajax-modal").html("");
+      });
+
+      //TODO: adapt the event bubbling code for $modalUniversal to the other types of modals above to allow html loaded via ajax to trigger the modal. You'll also need to adapt places that you've already made able to load a modal from ajax html, like the basiline update video in the statistics section
+      var $modalUniversal = $("#ajax-modal-universal");
+      $("body").on("click", ".ajax-modal-trigger-universal", function (event) {
+        $modalUniversal.empty();
+
+        $("body").modalmanager("loading");
+
+        var _this = this;
+
+        setTimeout(function () {
+          $modalUniversal.load($(_this).attr("data-url"), "", function () {
+            $modalUniversal.modal();
+          });
+        }, 1000);
+      });
+      //remove ajax modal html when modal is hidden
+      $(document).on("hidden.bs.modal", "#ajax-modal-universal", function () {
+        $("#ajax-modal-universal").html("");
+      });
+
+      //allows accordion to work in any div with the class accordions_allowed
+      $('a[href*="#"]:not([href="#"])')
+        .not(".accordions_allowed a")
+        .click(function () {
+          var offset = -(parseInt($(".page-header-top").height()) * 2); // <-- change the value here
+          if (
+            location.pathname.replace(/^\//, "") ==
+              this.pathname.replace(/^\//, "") &&
+            location.hostname == this.hostname
+          ) {
+            var target = $(this.hash);
+            target = target.length
+              ? target
+              : $("[name=" + this.hash.slice(1) + "]");
+            if (target.length) {
+              $("html, body").animate(
+                {
+                  scrollTop: target.offset().top + offset,
+                },
+                500
+              );
+              return false;
+            }
+          }
+        });
+    });
+
+    /***********  DATATABLES ******************/
+    $(window).load(function () {
+      /*$('.dataTable').dataTable({
+			"iDisplayLength": 100,
+			responsive: {
+				details: {
+					display: $.fn.dataTable.Responsive.display.childRowImmediate,
+					type: ''
+				}
+			},
+			columnDefs: [
+				{ responsivePriority: 1, targets: 0 },
+				{ responsivePriority: 1, targets: 1 },
+				{ responsivePriority: 1, targets: 3 }
+			]
+		});*/
+    });
+  </script>
+
+  <!-- copy to clipboard js -->
+  <script>
+    // copy to clipboard
+    document.addEventListener("DOMContentLoaded", function (event) {
+      function fallbackCopyTextToClipboard(text) {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+
+        // Avoid scrolling to bottom
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          var successful = document.execCommand("copy");
+          var msg = successful ? "successful" : "unsuccessful";
+          console.log("Fallback: Copying text command was " + msg);
+          return true;
+        } catch (err) {
+          console.error("Fallback: Oops, unable to copy", err);
+          return false;
+        }
+
+        document.body.removeChild(textArea);
+        return true; //TODO: make this function return the values from the try/catch statement
+      }
+
+      function copyTextToClipboard(text) {
+        if (!navigator.clipboard) {
+          return fallbackCopyTextToClipboard(text);
+        }
+        navigator.clipboard.writeText(text).then(
+          function () {
+            console.log("Async: Copying to clipboard was successful!");
+            return true;
+          },
+          function (err) {
+            console.error("Async: Could not copy text: ", err);
+            return false;
+          }
+        );
+        return true; //TODO: make this function return the values from the navigator.clipboard statement
+      }
+
+      var copyBtns = document.querySelectorAll(".js-copy-btn");
+
+      copyBtns.forEach(function (copyBtn) {
+        copyBtn.addEventListener("click", function (event) {
+          copy_button = event.currentTarget;
+          copy_button_text = copy_button.innerHTML;
+          if (copy_button.dataset.copyContent == null) {
+            if (copy_button.dataset.copyElement == null) {
+              // do nothing
+            } else {
+              copy_text = document.querySelector(
+                copy_button.dataset.copyElement
+              ).value;
+              let copied = copyTextToClipboard(copy_text);
+              if (copied) {
+                copy_button.innerHTML = "Copied";
+              } else {
+                copy_button.innerHTML = "ERROR";
+              }
+            }
+          } else {
+            copyTextToClipboard(copy_button.dataset.copyContent);
+            let copied = copyTextToClipboard(copy_text);
+            if (copied) {
+              copy_button.innerHTML = "Copied";
+            } else {
+              copy_button.innerHTML = "ERROR";
+            }
+          }
+          setTimeout(function () {
+            copy_button.innerHTML = copy_button_text;
+          }, 2000);
+        });
+      });
+    });
+  </script>
+
+  <!-- function to load image from picture / image element as css background image for another element -->
+  <script>
+    // img = image element function was called from
+    // id = id of element to load background image for
+    window.zImgLoad = function (img, id) {
+      var src = img.currentSrc ? img.currentSrc : img.src;
+      img.style.display = "none";
+      document.getElementById(id).style.backgroundImage = 'url("' + src + '")';
+    };
+  </script>
+
+  <!-- Browser Update Script (alerts users to update their browsers if they are out of date) -->
+  <script>
+    var $buoop = {
+      // required:{e:-4,f:-3,o:-3,s:-1,c:-3},
+      required: {
+        e: 88,
+        f: 78,
+        o: 75,
+        s: 14,
+        c: 88,
+      },
+      // Specifies required browser versions (e: explorer / edge, f: firefox, o: opera, s: safari, c: chrome)
+      // Browsers older than this will be notified.
+      // f:22 ---> Firefox < 22 gets notified
+      // Negative numbers specify how much versions behind current version.
+      // c:-5 ---> Chrome < 35  gets notified if latest Chrome version is 40.
+      // more details (in english)
+
+      insecure: true,
+      api: 2019.12,
+
+      reminder: 720,
+      // after how many hours should the message reappear
+      // 0 = show all the time
+
+      reminderClosed: 720,
+      // if the user explicitly closes message it reappears after x hours
+
+      onshow: function (infos) {},
+      onclick: function (infos) {},
+      onclose: function (infos) {},
+      // callback functions after notification has appeared / was clicked / closed
+
+      l: false,
+      // set a fixed language for the message, e.g. "en". This overrides the default detection.
+
+      test: false,
+      // true = always show the bar (for testing)
+
+      text: "",
+      // custom notification text (html)
+      // Placeholders {brow_name} will be replaced with the browser name, {up_but} with contents of the update link tag and {ignore_but} with contents for the ignore link.
+      // Example: "Your browser, {brow_name}, is too old: <a{up_but}>update</a> or <a{ignore_but}>ignore</a>."
+      // more details (in english)
+
+      text_in_xx: "",
+      // custom notification text for language "xx"
+      // e.g. text_de for german and text_it for italian
+
+      newwindow: true,
+      // open link in new window/tab
+
+      url: null,
+      // the url to go to after clicking the notification
+
+      noclose: false,
+      // Do not show the "ignore" button to close the notification
+
+      nomessage: false,
+      // Do not show a message if the browser is out of date, just call the onshow callback function
+
+      jsshowurl: "//browser-update.org/update.show.min.js",
+      // URL where the script, that shows the notification, is located. This is only loaded if the user actually has an outdated browser.
+
+      container: document.body,
+      // DOM Element where the notification will be injected.
+
+      no_permanent_hide: true,
+      // Do not give the user the option to permanently hide the notification
+    };
+
+    function $buo_f() {
+      var e = document.createElement("script");
+      e.src = "//browser-update.org/update.min.js";
+      document.body.appendChild(e);
+    }
+    try {
+      document.addEventListener("DOMContentLoaded", $buo_f, false);
+    } catch (e) {
+      window.attachEvent("onload", $buo_f);
+    }
+  </script>
+
+  <!-- Toggle between Team View & Admin View -->
+  <script>
+    function shiftView(logged_as) {
+      cookie_host = ".mypgi.com";
+      date = new Date();
+      date.setTime(date.getTime() + 86400);
+      //aa= "currently_logged_as="+logged_as+";path=/;domain="+cookie_host+";expires="+date.toGMTString();
+      //console.log(aa);
+      document.cookie =
+        "currently_logged_as=" +
+        logged_as +
+        ";path=/;domain=" +
+        cookie_host +
+        ";expires=" +
+        date.toGMTString();
+      window.location.href = "https://members.mypgi.com";
+      //history.go(0);
+      //console.log(aa);
+      //setcookie ('currently_logged_as', val);
+    }
+  </script>
+
+  <!-- Check if on Mobile Device -->
+  <script>
+    function isMobile() {
+      return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        window.navigator.userAgent
+      );
+    }
+
+    function readACookie(cookie_name) {
+      a = document.cookie
+        .split("; ")
+        .filter((row) => row.startsWith(cookie_name + "="))
+        .map((c) => c.split("=")[1])[0];
+      return a ? a : null;
+    }
+  </script>
+  <!-- END SCRIPTS -->
+
+  <link rel="shortcut icon" href="https://members.mypgi.com/favicon.ico" />
+
+  <!-- MEMBER TEMPLATE (if needed) -->
+  <script
+    type="text/javascript"
+    async=""
+    src="//t.contentsquare.net/uxa/smb/tag.js"
+  ></script>
+</head>
+
+<body>
+  <main>
+    <div class="npi-results-container">
+  <div class="col-lg-6 col-sm-12 col-xs-12">
+    <div id="np_roi_report">
+      <style>
+        #np-roi {
+          border-radius: 5px !important;
+          margin-left: 0px;
+          margin-right: 0px;
+        }
+
+        /*#np-roi #np-roi-np-sw {
+        writing-mode: tb-rl;
+        transform: rotate(-180deg);
+        font-size: 2em;
+        font-weight: bolder;
+        color: #FFFFFF;
+        text-transform: uppercase;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        text-align: center;
+        border-bottom: 1px solid rgb(220, 220, 220);
+        background: var(--brand-second);
+        width: 125%;
+        height: 340px;
+        vertical-align: bottom;
+        line-height: 4.5em;
+    }*/
+
+        #np-roi #np-roi-title {
+          font-size: 2em;
+          font-weight: bolder;
+          color: #ffffff;
+          text-transform: uppercase;
+          margin-top: 0px;
+          margin-bottom: 0px;
+          text-align: center;
+          border-bottom: 1px solid rgb(220, 220, 220);
+          background: var(--brand-second);
+          border-top-right-radius: 5px !important;
+          border-top-left-radius: 5px !important;
+        }
+
+        #np-roi .np-roi-section {
+          border: solid 2px var(--brand-sixth);
+          padding: 10px;
+          background-color: #ffffff;
+        }
+
+        #np-roi .np_roi_section_title {
+          font-size: 1.1em;
+          font-weight: thin;
+          color: var(--brand-main);
+          margin-top: 5px;
+          margin-bottom: 0px;
+          text-transform: uppercase;
+          letter-spacing: 4px;
+          text-align: center;
+          font-weight: 700;
+        }
+
+        #np-roi .np_roi_section_value {
+          min-height: 30px;
+          text-align: center;
+          font-size: 2.5em;
+          font-weight: bold;
+          color: var(--brand-main);
+          padding-bottom: 10px;
+        }
+
+        #np-roi .np_roi_error {
+          min-height: 30px;
+          line-height: 50px;
+          text-align: center;
+          font-size: 2.5em;
+          font-weight: bold;
+          padding-bottom: 10px;
+        }
+
+        #np-roi .insufficient_data {
+          display: block;
+          font-size: 1em;
+          line-height: 1em;
+          padding: 20px;
+          margin: 5px;
+          color: var(--brand-fourth);
+          border: 1px solid var(--brand-fourth);
+          background-color: var(--brand-sixth);
+          text-align: center;
+          border-radius: 99em !important;
+          font-weight: 500;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+        }
+        #np-roi .smtext {
+          text-transform: uppercase;
+          font-size: 15px;
+          color: var(--brand-fifth);
+          margin-top: -10px;
+          display: block;
+        }
+
+        /* https://stackoverflow.com/a/6040258/3281032 */
+        /* 0 size relatively positioned element to serve as a reference point for #np_increase */
+        /* basically we're trying to relatively position and element AND take it out of the document flow */
+        #np-roi #np_increase_start_position {
+          position: relative;
+          height: 0;
+          width: 0;
+        }
+        #np-roi #np_increase {
+          display: block;
+          position: absolute;
+          width: 100px;
+          text-align: left;
+          bottom: 9px;
+          left: 10px;
+          font-size: 16px;
+        }
+      </style>
+
+      <div id="np-roi">
+        <div class="row-flex">
+          <div class="col-flex-md-12" id="np-roi-title">
+            New Patients (NP) Results Summary
+          </div>
+        </div>
+        <div class="row-flex">
+          <div class="col-flex-md-6 np-roi-section">
+            <div class="np_roi_section_title">
+              Monthly Starting NP Average
+              <a
+                href="#"
+                id="monthly_starting_np_average"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="top"
+                title=""
+                data-html="true"
+                data-content="Your Starting New Patient Average"
+                data-original-title=""
+                ><i class="fa fa-info-circle" aria-hidden="true"></i
+              ></a>
+            </div>
+            <div class="np_roi_section_value">40</div>
+          </div>
+          <div class="col-flex-md-6 np-roi-section">
+            <div class="np_roi_section_title">
+              Current Average Revenue/NP
+              <a
+                href="#"
+                id="current_avg_rev_per_np"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="top"
+                title=""
+                data-html="true"
+                data-content="Current Collections Average divided by Current New Patient Average (based on last 12 months)"
+                data-original-title=""
+                ><i class="fa fa-info-circle" aria-hidden="true"></i
+              ></a>
+            </div>
+            <div class="np_roi_section_value">$3,315</div>
+          </div>
+          <div class="col-flex-md-6 np-roi-section">
+            <div class="np_roi_section_title">
+              Monthly NP Average Since Start
+              <a
+                href="#"
+                id="monthly_np_avg_since_start"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="top"
+                title=""
+                data-html="true"
+                data-content="New Patient Average since becoming a member (Membership Start Date: May, 2024)"
+                data-original-title=""
+                ><i class="fa fa-info-circle" aria-hidden="true"></i
+              ></a>
+            </div>
+            <div class="np_roi_section_value">
+              42
+              <span id="np_increase_start_position">
+                <span id="np_increase" style="color: limegreen"> (+2) </span>
+              </span>
+            </div>
+          </div>
+          <div class="col-flex-md-6 np-roi-section">
+            <div class="np_roi_section_title">
+              Average Monthly Projected Return
+              <a
+                href="#"
+                id="avg_monthly_return_project_calculation"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="top"
+                title=""
+                data-html="true"
+                data-content="Average Monthly Revenue per NP * NP Increase"
+                data-original-title=""
+                ><i class="fa fa-info-circle" aria-hidden="true"></i
+              ></a>
+            </div>
+            <div class="np_roi_section_value">$6,631</div>
+          </div>
+        </div>
+        <div class="row-flex">
+          <div
+            class="col-flex-md-12 np-roi-section"
+            style="background-color: var(--brand-sixth)"
+          >
+            <div class="np_roi_section_title">
+              Total Value of Additional NP
+              <a
+                href="#"
+                id="total_val_add_np_calculation"
+                data-toggle="popover"
+                data-trigger="hover"
+                data-placement="top"
+                title=""
+                data-html="true"
+                data-content="Average Monthly Projected Return * Number of Months You have been a member"
+                data-original-title=""
+                ><i class="fa fa-info-circle" aria-hidden="true"></i
+              ></a>
+            </div>
+            <div class="np_roi_section_value">$33,155</div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        $(document).ready(function () {
+          // initialize popovers
+          $("#total_val_add_np_calculation").popover();
+          $("#avg_monthly_return_project_calculation").popover();
+          $("#monthly_np_avg_since_start").popover();
+          $("#monthly_starting_np_average").popover();
+          $("#current_avg_rev_per_np").popover();
+        });
+      </script>
+    </div>
+    <!-- <a
+    class="btn btn-warning ajax-modal-trigger"
+    style="width: 100%"
+    data-toggle="modal"
+    href="#ajax-modal"
+    data-url="https://members.mypgi.com/modal/np_results_explanation/npi_roi_report"
+  >
+    Internal Notes
+  </a> -->
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $("#np_roi_report").load(
+          "https://members.mypgi.com/progress-reports/np-roi"
+        );
+      });
+    </script>
+  </div>
+</div>
+  </main>
+</body>
+</html>
