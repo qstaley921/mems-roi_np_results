@@ -73,6 +73,7 @@ body {
   border-bottom: 1px solid #d0d0d0;
   position: relative;
   overflow: visible;
+  z-index: 40;
 }
 
 .panel-header::after {
@@ -289,10 +290,47 @@ body {
 
 /* Data Table */
 .data-table-container {
-  padding: 0.5rem 0 0 0;
+  padding: 0;
   overflow-x: auto;
-  overflow-y: visible;
-  margin: 0 1.5rem;
+  overflow-y: auto;
+  margin: -0.5rem 1.5rem 0.5rem 1.5rem;
+  max-height: 185px;
+  padding-right: 1rem;
+  scrollbar-gutter: stable;
+  position: relative;
+}
+
+.data-table-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1rem;
+  height: 2.5rem;
+  background-color: #ffffff;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.data-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.data-table-container::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin-top: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.data-table-container::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border-radius: 4px;
+}
+
+.data-table-container::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
 }
 
 .data-table {
@@ -300,13 +338,20 @@ body {
   border-collapse: collapse;
 }
 
+.data-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
 .data-table thead th {
-  background-color: transparent;
-  padding: 0.75rem 0.5rem;
+  background-color: #ffffff;
+  padding: 1.25rem 0.5rem 0.75rem 0.5rem;
   text-align: left;
   font-weight: 700;
   border-bottom: none;
   white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .data-table thead th:first-child {
@@ -314,7 +359,8 @@ body {
   position: sticky;
   left: 0;
   background-color: #ffffff;
-  z-index: 10;
+  z-index: 30;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .data-table thead th:last-child {
@@ -323,6 +369,7 @@ body {
 
 .data-table tbody td {
   padding: 1rem 0.5rem;
+  white-space: nowrap;
 }
 
 .data-table tbody td:first-child {
@@ -330,15 +377,11 @@ body {
   position: sticky;
   left: 0;
   z-index: 5;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
 }
 
 .data-table tbody td:last-child {
   padding-right: 0;
-}
-
-/* Growth Total column cannot wrap */
-.data-table tbody td.col-growth-total {
-  white-space: nowrap;
 }
 
 .data-table tbody tr:nth-child(even) td:first-child {

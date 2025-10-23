@@ -24,6 +24,34 @@ const npData = {
       newAvg: 22.08,
       avgRevenue: 2457,
       durationMonths: 36
+    },
+    {
+      name: "Westside",
+      startAvg: 31.5,
+      newAvg: 38.75,
+      avgRevenue: 2650,
+      durationMonths: 36
+    },
+    {
+      name: "North Point",
+      startAvg: 19.25,
+      newAvg: 28.5,
+      avgRevenue: 2890,
+      durationMonths: 36
+    },
+    {
+      name: "Riverside",
+      startAvg: 42.0,
+      newAvg: 48.33,
+      avgRevenue: 2275,
+      durationMonths: 36
+    },
+    {
+      name: "Downtown",
+      startAvg: 35.67,
+      newAvg: 41.92,
+      avgRevenue: 3100,
+      durationMonths: 36
     }
   ],
   investment: {
