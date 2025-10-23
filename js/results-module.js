@@ -106,15 +106,15 @@ function updateTable(period, customYears = 2) {
 
   tbody.innerHTML = metrics.locations.map(location => `
     <tr>
-      <td class="location-name">${location.name}</td>
-      <td>${location.startAvg.toLocaleString()}</td>
-      <td>${location.newAvg.toLocaleString()}</td>
-      <td>
+      <td class="col-location location-name">${location.name}</td>
+      <td class="col-start-avg">${location.startAvg.toLocaleString()}</td>
+      <td class="col-new-avg">${location.newAvg.toLocaleString()}</td>
+      <td class="col-growth">
         ${location.growth.toLocaleString()}
         ${location.growthPercent > 0 ? `<span class="growth-percent">(${location.growthPercent}%)</span>` : ''}
       </td>
-      <td>$${location.avgRevenue.toLocaleString()}</td>
-      <td class="growth-total">$${location.growthTotal.toLocaleString()}</td>
+      <td class="col-revenue">$${location.avgRevenue.toLocaleString()}</td>
+      <td class="col-growth-total growth-total">$${location.growthTotal.toLocaleString()}</td>
     </tr>
   `).join('');
 
