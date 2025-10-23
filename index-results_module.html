@@ -96,12 +96,20 @@
               </div>
 
               <div class="panel-actions">
-                <button class="btn-icon" title="Table View">
-                  <i class="fas fa-table"></i> Table
-                </button>
-                <button class="btn-icon" title="Edit">
-                  <i class="fas fa-edit"></i>
-                </button>
+                <div class="view-toggle active-table" id="viewToggle">
+                  <div class="toggle-track">
+                    <div class="toggle-option toggle-option-left">
+                      <i class="fas fa-table"></i>
+                    </div>
+                    <div class="toggle-option toggle-option-right">
+                      <i class="fas fa-chart-simple"></i>
+                    </div>
+                    <div class="toggle-ball">
+                      <i class="fas fa-table"></i>
+                      <span>Table</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -120,7 +128,7 @@
                       <i class="fas fa-star"></i> New Avg.
                     </th>
                     <th class="col-growth">
-                      <i class="fas fa-arrow-up"></i> Growth
+                      <i class="fas fa-chart-simple"></i> Growth
                     </th>
                     <th class="col-revenue">
                       <i class="fas fa-dollar-sign"></i> Avg. Revenue / N.P.

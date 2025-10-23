@@ -214,4 +214,63 @@ document.addEventListener('DOMContentLoaded', function() {
       option.classList.add('selected');
     }
   });
+
+  // View toggle handler
+  const viewToggle = document.getElementById('viewToggle');
+  const toggleBall = viewToggle.querySelector('.toggle-ball');
+  let currentView = 'table';
+
+  viewToggle.addEventListener('click', function() {
+    const ballIcon = toggleBall.querySelector('i');
+    const ballText = toggleBall.querySelector('span');
+
+    // Fade out current content
+    ballIcon.style.opacity = '0';
+    ballText.style.opacity = '0';
+
+    setTimeout(() => {
+      if (currentView === 'table') {
+        // Switch to graph
+        currentView = 'graph';
+        toggleBall.classList.remove('active-table');
+        toggleBall.classList.add('active-graph');
+        viewToggle.classList.remove('active-table');
+        viewToggle.classList.add('active-graph');
+
+        // Update ball content
+        toggleBall.innerHTML = '<i class="fas fa-chart-simple"></i><span>Graph</span>';
+
+        // TODO: Show graph view, hide table view
+        console.log('Switched to graph view');
+      } else {
+        // Switch to table
+        currentView = 'table';
+        toggleBall.classList.remove('active-graph');
+        toggleBall.classList.add('active-table');
+        viewToggle.classList.remove('active-graph');
+        viewToggle.classList.add('active-table');
+
+        // Update ball content
+        toggleBall.innerHTML = '<i class="fas fa-table"></i><span>Table</span>';
+
+        // TODO: Show table view, hide graph view
+        console.log('Switched to table view');
+      }
+
+      // Set new content to opacity 0 immediately
+      const newIcon = toggleBall.querySelector('i');
+      const newText = toggleBall.querySelector('span');
+      newIcon.style.opacity = '0';
+      newText.style.opacity = '0';
+
+      // Fade in new content after a small delay
+      setTimeout(() => {
+        newIcon.style.opacity = '1';
+        newText.style.opacity = '1';
+      }, 50);
+    }, 250);
+  });
+
+  // Initialize toggle state
+  viewToggle.classList.add('active-table');
 });
