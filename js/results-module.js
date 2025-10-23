@@ -61,7 +61,7 @@ const npData = {
 };
 
 // Current selected period
-let currentPeriod = 'yearly';
+let currentPeriod = 'monthly';
 let customYearsValue = 2;
 
 // Calculation functions

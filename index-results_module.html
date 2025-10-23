@@ -52,9 +52,9 @@
             <!-- Panel Header with Time Period Tabs -->
             <div class="panel-header">
               <div class="time-period-tabs">
-              <button class="tab-btn" data-period="monthly">Monthly</button>
+              <button class="tab-btn active" data-period="monthly">Monthly</button>
               <button class="tab-btn" data-period="quarterly">Quarterly</button>
-              <button class="tab-btn active" data-period="yearly">Yearly</button>
+              <button class="tab-btn" data-period="yearly">Yearly</button>
               <button class="tab-btn" data-period="total">Total</button>
               <select class="custom-years-select" id="customYearsSelect">
                 <option value="2">2 Years</option>
@@ -132,31 +132,40 @@
             <div class="metrics-cards">
               <div class="metric-card investment-card">
                 <div class="card-header">
-                  <h3>Investment <i class="fas fa-info-circle"></i></h3>
-                  <span class="date-range">Aug 24 - Jul 25</span>
+                  <h3>Investment</h3>
+                  <span class="date-range" id="investmentDateRange">Aug 24 - Jul 25</span>
                 </div>
                 <div class="card-value">
                   <span id="investmentTotal">$14,587</span>
                   <span class="period" id="investmentPeriod">/year</span>
                 </div>
                 <div class="card-breakdown">
-                  <span class="breakdown-item" id="investmentTraining">$9,798</span>
+                  <div class="breakdown-chip">
+                    <div class="chip-value" id="investmentTraining">$9,798</div>
+                    <div class="chip-label">New Patient Trainings</div>
+                  </div>
                   <span class="breakdown-operator">+</span>
-                  <span class="breakdown-item" id="investmentProgram">$4,789</span>
+                  <div class="breakdown-chip">
+                    <div class="chip-value" id="investmentProgram">$4,789</div>
+                    <div class="chip-label">New Patient Program</div>
+                  </div>
                 </div>
               </div>
 
               <div class="metric-card return-card">
                 <div class="card-header">
-                  <h3>Return <i class="fas fa-info-circle"></i></h3>
-                  <span class="date-range">Aug 24 - Jul 25</span>
+                  <h3>Return</h3>
+                  <span class="date-range" id="returnDateRange">Aug 24 - Jul 25</span>
                 </div>
                 <div class="card-value">
                   <span id="returnTotal">$610,339</span>
                   <span class="period" id="returnPeriod">/year</span>
                 </div>
                 <div class="card-breakdown">
-                  <span class="breakdown-item" id="returnGrowth">250</span>
+                  <div class="breakdown-chip">
+                    <div class="chip-value" id="returnGrowth">250</div>
+                    <div class="chip-label">Additional New Patients</div>
+                  </div>
                 </div>
               </div>
             </div>
