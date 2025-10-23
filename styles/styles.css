@@ -83,19 +83,6 @@ body {
   z-index: 40;
 }
 
-.panel-header::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 60px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  pointer-events: none;
-  z-index: 15;
-}
 
 .panel-actions {
   display: flex;
@@ -216,6 +203,7 @@ body {
   overflow-y: visible;
   flex: 1;
   padding-right: 50px;
+  position: relative;
 }
 
 .time-period-tabs::-webkit-scrollbar {
@@ -352,7 +340,17 @@ body {
   z-index: 20;
 }
 
-.data-table thead::after {
+.data-table thead th {
+  background-color: #ffffff;
+  padding: 1.25rem 0.5rem 0.75rem 0.5rem;
+  text-align: center;
+  font-weight: 700;
+  border-bottom: none;
+  white-space: nowrap;
+  position: relative;
+}
+
+.data-table thead th::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -361,17 +359,6 @@ body {
   height: 1px;
   background-color: #d0d0d0;
   z-index: 19;
-}
-
-.data-table thead th {
-  background-color: #ffffff;
-  padding: 1.25rem 0.5rem 0.75rem 0.5rem;
-  text-align: center;
-  font-weight: 700;
-  border-bottom: none;
-  white-space: nowrap;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  position: relative;
 }
 
 .data-table thead th i {
@@ -384,10 +371,20 @@ body {
   left: 0;
   background-color: #ffffff;
   z-index: 31;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .data-table thead th:first-child::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: #d0d0d0;
+  z-index: 32;
+}
+
+.data-table thead th:first-child::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -398,7 +395,10 @@ body {
   z-index: 32;
 }
 
-.data-table thead th:first-child::after {
+.data-table thead th:nth-child(2)::before,
+.data-table thead th:nth-child(3)::before,
+.data-table thead th:nth-child(4)::before,
+.data-table thead th:nth-child(5)::before {
   content: '';
   position: absolute;
   top: 0;
@@ -406,27 +406,7 @@ body {
   bottom: 0;
   width: 1px;
   background-color: #d0d0d0;
-  z-index: 32;
-}
-
-.data-table thead th:not(:first-child):not(:nth-child(2)):not(:last-child)::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 1px;
-  background-color: #d0d0d0;
-}
-
-.data-table thead th:nth-child(3)::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 1px;
-  background-color: #d0d0d0;
+  z-index: 21;
 }
 
 .data-table thead th:last-child {
@@ -445,7 +425,6 @@ body {
   position: sticky;
   left: 0;
   z-index: 6;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
 }
 
 .data-table tbody td:first-child::after {
@@ -646,5 +625,6 @@ body {
     margin-top: 2rem;
   }
 }
+
 
  
