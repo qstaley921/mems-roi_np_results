@@ -36,6 +36,16 @@ body {
 
 .main-content .row > div {
   display: flex;
+  flex-direction: column;
+}
+
+/* Module Title */
+.module-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  padding-left: 1.5rem;
+  color: #2d2d2d;
 }
 
 /* Results Panel */
@@ -57,17 +67,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.panel-title {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .panel-actions {
   display: flex;
   gap: 0.5rem;
+  margin-left: auto;
 }
 
 .btn-icon {
@@ -89,13 +96,14 @@ body {
 
 /* Time Period Tabs */
 .time-period-tabs {
-  padding: 1rem 1.5rem;
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .tab-btn {
-  background-color: #e0e0e0;
+  background-color: #4a4a4a;
+  color: #ffffff;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -105,16 +113,16 @@ body {
 }
 
 .tab-btn.active {
-  background-color: #2d2d2d;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #2d2d2d;
 }
 
 .tab-btn:hover {
-  background-color: #c0c0c0;
+  background-color: #5a5a5a;
 }
 
 .tab-btn.active:hover {
-  background-color: #3d3d3d;
+  background-color: #f0f0f0;
 }
 
 .tab-btn-custom {
@@ -127,39 +135,88 @@ body {
 .tab-btn-custom span {
   font-size: 1rem;
   font-weight: 600;
+  color: #ffffff;
 }
 
-.custom-years-select {
-  width: 35px;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  padding-right: 18px;
-  text-align: left;
+.tab-btn-custom.active span {
+  color: #2d2d2d;
+}
+
+/* Custom Dropdown */
+.custom-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+
+.dropdown-value {
+  font-family: 'Lato', sans-serif;
   font-size: 1rem;
   font-weight: 600;
-  background-color: transparent;
+  color: #ffffff;
+  min-width: 15px;
+  text-align: right;
+}
+
+.dropdown-arrow {
+  font-size: 0.75rem;
+  color: #ffffff;
+  transition: transform 0.2s;
+}
+
+.custom-dropdown.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.tab-btn-custom.active .dropdown-value,
+.tab-btn-custom.active .dropdown-arrow {
+  color: #2d2d2d;
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.dropdown-options.show {
+  display: block;
+}
+
+.dropdown-option {
+  padding: 0.5rem 1rem;
+  font-family: 'Lato', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d2d2d;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right center;
-  background-size: 14px;
+  min-width: 60px;
+  text-align: center;
 }
 
-.custom-years-select:focus {
-  outline: none;
+.dropdown-option:hover {
+  background-color: #f0f0f0;
 }
 
-.tab-btn-custom.active .custom-years-select {
+.dropdown-option.selected {
+  background-color: #2d2d2d;
   color: #ffffff;
 }
 
 /* Data Table */
 .data-table-container {
-  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+  padding: 0.5rem 0 0 0;
 }
 
 .data-table {
@@ -172,15 +229,15 @@ body {
   padding: 0.75rem 0.5rem;
   text-align: left;
   font-weight: 700;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: none;
 }
 
 .data-table thead th:first-child {
-  padding-left: 0;
+  padding-left: 1.5rem;
 }
 
 .data-table thead th:last-child {
-  padding-right: 0;
+  padding-right: 1.5rem;
 }
 
 .data-table tbody td {
@@ -188,11 +245,11 @@ body {
 }
 
 .data-table tbody td:first-child {
-  padding-left: 0;
+  padding-left: 1.5rem;
 }
 
 .data-table tbody td:last-child {
-  padding-right: 0;
+  padding-right: 1.5rem;
 }
 
 .data-table tbody tr:nth-child(even) {
@@ -204,7 +261,7 @@ body {
 }
 
 .location-name {
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .growth-percent {
@@ -222,7 +279,8 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem;
+  padding-top: 1.5rem;
 }
 
 .metric-card {
@@ -302,5 +360,21 @@ body {
 
   .quick-links-panel {
     margin-top: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .panel-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .time-period-tabs {
+    width: 100%;
   }
 } 

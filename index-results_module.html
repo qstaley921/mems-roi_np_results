@@ -45,10 +45,56 @@
       <div class="row">
         <!-- Left Column: New Patient Results -->
         <div class="col-lg-6 col-md-12">
+          <!-- Module Title -->
+          <h1 class="module-title">New Patient Results</h1>
+
           <section class="results-panel">
-            <!-- Panel Header -->
+            <!-- Panel Header with Time Period Tabs -->
             <div class="panel-header">
-              <h2 class="panel-title">New Patient Results</h2>
+              <div class="time-period-tabs">
+              <button class="tab-btn" data-period="monthly">Monthly</button>
+              <button class="tab-btn" data-period="quarterly">Quarterly</button>
+              <button class="tab-btn active" data-period="yearly">Yearly</button>
+              <button class="tab-btn" data-period="total">Total</button>
+              <button class="tab-btn tab-btn-custom" data-period="custom">
+                <div class="custom-dropdown">
+                  <span class="dropdown-value" id="dropdownValue">2 Years</span>
+                  <div class="dropdown-options" id="dropdownOptions">
+                    <div class="dropdown-option" data-value="2">2 Years</div>
+                    <div class="dropdown-option" data-value="3">3 Years</div>
+                    <div class="dropdown-option" data-value="4">4 Years</div>
+                    <div class="dropdown-option" data-value="5">5 Years</div>
+                    <div class="dropdown-option" data-value="6">6 Years</div>
+                    <div class="dropdown-option" data-value="7">7 Years</div>
+                    <div class="dropdown-option" data-value="8">8 Years</div>
+                    <div class="dropdown-option" data-value="9">9 Years</div>
+                    <div class="dropdown-option" data-value="10">10 Years</div>
+                    <div class="dropdown-option" data-value="11">11 Years</div>
+                    <div class="dropdown-option" data-value="12">12 Years</div>
+                    <div class="dropdown-option" data-value="13">13 Years</div>
+                    <div class="dropdown-option" data-value="14">14 Years</div>
+                    <div class="dropdown-option" data-value="15">15 Years</div>
+                    <div class="dropdown-option" data-value="16">16 Years</div>
+                    <div class="dropdown-option" data-value="17">17 Years</div>
+                    <div class="dropdown-option" data-value="18">18 Years</div>
+                    <div class="dropdown-option" data-value="19">19 Years</div>
+                    <div class="dropdown-option" data-value="20">20 Years</div>
+                    <div class="dropdown-option" data-value="21">21 Years</div>
+                    <div class="dropdown-option" data-value="22">22 Years</div>
+                    <div class="dropdown-option" data-value="23">23 Years</div>
+                    <div class="dropdown-option" data-value="24">24 Years</div>
+                    <div class="dropdown-option" data-value="25">25 Years</div>
+                    <div class="dropdown-option" data-value="26">26 Years</div>
+                    <div class="dropdown-option" data-value="27">27 Years</div>
+                    <div class="dropdown-option" data-value="28">28 Years</div>
+                    <div class="dropdown-option" data-value="29">29 Years</div>
+                    <div class="dropdown-option" data-value="30">30 Years</div>
+                  </div>
+                </div>
+                <i class="fas fa-caret-down dropdown-arrow"></i>
+              </button>
+              </div>
+
               <div class="panel-actions">
                 <button class="btn-icon" title="Table View">
                   <i class="fas fa-table"></i> Table
@@ -57,49 +103,6 @@
                   <i class="fas fa-edit"></i>
                 </button>
               </div>
-            </div>
-
-            <!-- Time Period Tabs -->
-            <div class="time-period-tabs">
-              <button class="tab-btn" data-period="monthly">Monthly</button>
-              <button class="tab-btn" data-period="quarterly">Quarterly</button>
-              <button class="tab-btn active" data-period="yearly">Yearly</button>
-              <button class="tab-btn" data-period="total">Total</button>
-              <button class="tab-btn tab-btn-custom" data-period="custom">
-                <select id="customYears" class="custom-years-select">
-                  <option value="1">1</option>
-                  <option value="2" selected>2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                  <option value="8">8</option>
-                  <option value="9">9</option>
-                  <option value="10">10</option>
-                  <option value="11">11</option>
-                  <option value="12">12</option>
-                  <option value="13">13</option>
-                  <option value="14">14</option>
-                  <option value="15">15</option>
-                  <option value="16">16</option>
-                  <option value="17">17</option>
-                  <option value="18">18</option>
-                  <option value="19">19</option>
-                  <option value="20">20</option>
-                  <option value="21">21</option>
-                  <option value="22">22</option>
-                  <option value="23">23</option>
-                  <option value="24">24</option>
-                  <option value="25">25</option>
-                  <option value="26">26</option>
-                  <option value="27">27</option>
-                  <option value="28">28</option>
-                  <option value="29">29</option>
-                  <option value="30">30</option>
-                </select>
-                <span>Years</span>
-              </button>
             </div>
 
             <!-- Data Table -->
@@ -111,7 +114,7 @@
                       <i class="fas fa-map-marker-alt"></i> Locations
                     </th>
                     <th class="col-start-avg">
-                      <i class="fas fa-chart-line"></i> Start Avg.
+                      <i class="fas fa-flag-checkered"></i> Start Avg.
                     </th>
                     <th class="col-new-avg">
                       <i class="fas fa-star"></i> New Avg.
@@ -182,184 +185,6 @@
 
   <!-- Scripts -->
   <script src="https://members.mypgi.com/min/g=new-ms-js?v=0.62"></script>
-
-  <script>
-    // New Patient Results Data (Monthly base values)
-    const npData = {
-      locations: [
-        {
-          name: "Bradley Place",
-          startAvg: 27,        // Monthly starting average
-          newAvg: 35.08,       // Monthly new average
-          avgRevenue: 2978,    // Average revenue per new patient
-          durationMonths: 36   // Total months with company
-        },
-        {
-          name: "East Lake",
-          startAvg: 37.08,
-          newAvg: 42.33,
-          avgRevenue: 2101,
-          durationMonths: 36
-        },
-        {
-          name: "Fullerton",
-          startAvg: 22.92,
-          newAvg: 22.08,
-          avgRevenue: 2457,
-          durationMonths: 36
-        }
-      ],
-      investment: {
-        training: 816.5,     // Monthly training investment
-        program: 399.08      // Monthly program investment
-      }
-    };
-
-    // Current selected period
-    let currentPeriod = 'yearly';
-    let customYearsValue = 2;
-
-    // Calculation functions
-    function calculateMetrics(period, customYears = 2) {
-      const multiplier = getMultiplier(period, customYears);
-      const periodLabel = getPeriodLabel(period, customYears);
-
-      const results = npData.locations.map(location => {
-        const startAvg = Math.round(location.startAvg * multiplier);
-        const newAvg = Math.round(location.newAvg * multiplier);
-        const growth = newAvg - startAvg;
-        const growthPercent = location.startAvg > 0 ? Math.round((growth / (location.startAvg * multiplier)) * 100) : 0;
-        const growthTotal = growth * location.avgRevenue;
-
-        return {
-          name: location.name,
-          startAvg,
-          newAvg,
-          growth,
-          growthPercent,
-          avgRevenue: location.avgRevenue,
-          growthTotal
-        };
-      });
-
-      // Calculate totals
-      const totalGrowth = results.reduce((sum, loc) => sum + loc.growth, 0);
-      const totalInvestment = (npData.investment.training + npData.investment.program) * multiplier;
-      const trainingInvestment = npData.investment.training * multiplier;
-      const programInvestment = npData.investment.program * multiplier;
-      const totalReturn = results.reduce((sum, loc) => sum + loc.growthTotal, 0);
-
-      return {
-        locations: results,
-        totalGrowth,
-        totalInvestment,
-        trainingInvestment,
-        programInvestment,
-        totalReturn,
-        periodLabel
-      };
-    }
-
-    function getMultiplier(period, customYears) {
-      switch(period) {
-        case 'monthly': return 1;
-        case 'quarterly': return 3;
-        case 'yearly': return 12;
-        case 'total': return npData.locations[0].durationMonths; // Using first location's duration
-        case 'custom': return 12 * customYears;
-        default: return 1;
-      }
-    }
-
-    function getPeriodLabel(period, customYears) {
-      switch(period) {
-        case 'monthly': return '/month';
-        case 'quarterly': return '/quarter';
-        case 'yearly': return '/year';
-        case 'total': return '/total';
-        case 'custom': return `/${customYears} year${customYears > 1 ? 's' : ''}`;
-        default: return '';
-      }
-    }
-
-    // Update table display
-    function updateTable(period, customYears = 2) {
-      const metrics = calculateMetrics(period, customYears);
-      const tbody = document.getElementById('dataTableBody');
-
-      tbody.innerHTML = metrics.locations.map(location => `
-        <tr>
-          <td class="location-name">${location.name}</td>
-          <td>${location.startAvg.toLocaleString()}</td>
-          <td>${location.newAvg.toLocaleString()}</td>
-          <td>
-            ${location.growth.toLocaleString()}
-            ${location.growthPercent > 0 ? `<span class="growth-percent">(${location.growthPercent}%)</span>` : ''}
-          </td>
-          <td>$${location.avgRevenue.toLocaleString()}</td>
-          <td class="growth-total">$${location.growthTotal.toLocaleString()}</td>
-        </tr>
-      `).join('');
-
-      // Update investment and return cards
-      document.getElementById('investmentTotal').textContent = `$${Math.round(metrics.totalInvestment).toLocaleString()}`;
-      document.getElementById('investmentPeriod').textContent = metrics.periodLabel;
-      document.getElementById('investmentTraining').textContent = `$${Math.round(metrics.trainingInvestment).toLocaleString()}`;
-      document.getElementById('investmentProgram').textContent = `$${Math.round(metrics.programInvestment).toLocaleString()}`;
-
-      document.getElementById('returnTotal').textContent = `$${Math.round(metrics.totalReturn).toLocaleString()}`;
-      document.getElementById('returnPeriod').textContent = metrics.periodLabel;
-      document.getElementById('returnGrowth').textContent = metrics.totalGrowth.toLocaleString();
-    }
-
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initial table render
-      updateTable(currentPeriod);
-
-      // Tab button click handlers
-      const tabButtons = document.querySelectorAll('.tab-btn:not(.tab-btn-custom)');
-      tabButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-          // Remove active class from all buttons
-          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-          // Add active class to clicked button
-          this.classList.add('active');
-
-          // Update period and table
-          currentPeriod = this.dataset.period;
-          updateTable(currentPeriod);
-        });
-      });
-
-      // Custom years button handler
-      const customBtn = document.querySelector('.tab-btn-custom');
-      const customYearsSelect = document.getElementById('customYears');
-
-      customBtn.addEventListener('click', function(e) {
-        // Don't trigger if clicking the select
-        if (e.target === customYearsSelect) return;
-
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        currentPeriod = 'custom';
-        customYearsValue = parseInt(customYearsSelect.value) || 2;
-        updateTable(currentPeriod, customYearsValue);
-      });
-
-      customYearsSelect.addEventListener('change', function() {
-        customYearsValue = parseInt(this.value) || 2;
-        // Activate the custom button when changing the select
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        customBtn.classList.add('active');
-        currentPeriod = 'custom';
-        updateTable(currentPeriod, customYearsValue);
-      });
-
-      customYearsSelect.addEventListener('click', function(e) {
-        e.stopPropagation();
-      });
-    });
-  </script>
+  <script src="js/results-module.js"></script>
 </body>
 </html>
