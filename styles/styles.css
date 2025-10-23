@@ -89,11 +89,9 @@ body {
 
 /* Time Period Tabs */
 .time-period-tabs {
-  background-color: #f9f9f9;
   padding: 1rem 1.5rem;
   display: flex;
   gap: 0.5rem;
-  border-bottom: 1px solid #e0e0e0;
 }
 
 .tab-btn {
@@ -119,9 +117,49 @@ body {
   background-color: #3d3d3d;
 }
 
+.tab-btn-custom {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+}
+
+.tab-btn-custom span {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.custom-years-select {
+  width: 35px;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  padding-right: 18px;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: transparent;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 14px;
+}
+
+.custom-years-select:focus {
+  outline: none;
+}
+
+.tab-btn-custom.active .custom-years-select {
+  color: #ffffff;
+}
+
 /* Data Table */
 .data-table-container {
-  padding: 1.5rem;
+  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
 }
 
 .data-table {
@@ -130,16 +168,39 @@ body {
 }
 
 .data-table thead th {
-  background-color: #f5f5f5;
-  padding: 0.75rem;
+  background-color: transparent;
+  padding: 0.75rem 0.5rem;
   text-align: left;
   font-weight: 700;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.data-table thead th:first-child {
+  padding-left: 0;
+}
+
+.data-table thead th:last-child {
+  padding-right: 0;
 }
 
 .data-table tbody td {
-  padding: 0.75rem;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem 0.5rem;
+}
+
+.data-table tbody td:first-child {
+  padding-left: 0;
+}
+
+.data-table tbody td:last-child {
+  padding-right: 0;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.data-table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
 }
 
 .location-name {
@@ -149,6 +210,11 @@ body {
 .growth-percent {
   color: #27ae60;
   font-size: 0.85em;
+}
+
+.growth-total {
+  font-weight: 700;
+  color: #27ae60;
 }
 
 /* Metrics Cards */
