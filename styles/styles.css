@@ -129,7 +129,7 @@ body {
 
 .toggle-track {
   position: relative;
-  background-color: #ffffff;
+  background-color: #f5f5f5;
   border: 1px solid #d0d0d0;
   border-radius: 4px !important;
   padding: 4px;
@@ -138,6 +138,11 @@ body {
   cursor: pointer;
   width: 110px;
   height: 36px;
+  transition: background-color 0.2s;
+}
+
+.toggle-track:hover {
+  background-color: #ebebeb;
 }
 
 .toggle-option {
@@ -167,7 +172,7 @@ body {
   position: absolute;
   top: 4px;
   left: 4px;
-  background-color: #4a4a4a;
+  background: linear-gradient(135deg, #2d2d2d 0%, #4a4a4a 50%, #5a5a5a 100%);
   border-radius: 4px !important;
   padding: 0.5rem 1rem;
   display: flex;
@@ -175,7 +180,7 @@ body {
   gap: 0.5rem;
   font-size: 14px !important;
   font-weight: 600;
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.95);
   transition: transform 0.3s ease;
   z-index: 2;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -235,9 +240,10 @@ body {
 }
 
 .tab-btn.active {
-  background-color: #4a4a4a;
-  color: #ffffff;
-  border: 1px solid #4a4a4a;
+  background: linear-gradient(135deg, #2d2d2d 0%, #4a4a4a 50%, #5a5a5a 100%);
+  color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #2d2d2d;
+  box-shadow: 0 0 0 1px rgba(45, 45, 45, 0.3);
 }
 
 .tab-btn:hover {
@@ -246,8 +252,9 @@ body {
 }
 
 .tab-btn.active:hover {
-  background-color: #5a5a5a;
-  border: 1px solid #5a5a5a;
+  background: linear-gradient(135deg, #2d2d2d 0%, #5a5a5a 50%, #6a6a6a 100%);
+  border: 1px solid #2d2d2d;
+  box-shadow: 0 0 0 1px rgba(45, 45, 45, 0.4);
 }
 
 .tab-btn[data-period="total"] {
@@ -288,15 +295,17 @@ body {
 }
 
 .custom-years-select.active {
-  background-color: #4a4a4a;
-  color: #ffffff;
-  border: 1px solid #4a4a4a;
+  background: linear-gradient(135deg, #2d2d2d 0%, #4a4a4a 50%, #5a5a5a 100%);
+  color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #2d2d2d;
+  box-shadow: 0 0 0 1px rgba(45, 45, 45, 0.3);
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
 }
 
 .custom-years-select.active:hover {
-  background-color: #5a5a5a;
-  border: 1px solid #5a5a5a;
+  background: linear-gradient(135deg, #2d2d2d 0%, #5a5a5a 50%, #6a6a6a 100%);
+  border: 1px solid #2d2d2d;
+  box-shadow: 0 0 0 1px rgba(45, 45, 45, 0.4);
 }
 
 /* Data Table */
@@ -513,11 +522,11 @@ body {
 }
 
 .investment-card {
-  background-color: #e0e0e0;
+  background: linear-gradient(135deg, #c8c8c8 0%, #e8e8e8 100%);
 }
 
 .return-card {
-  background-color: #d4edda;
+  background: linear-gradient(135deg, #b8ddc0 0%, #d4edda 100%);
 }
 
 .card-value-header {
