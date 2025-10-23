@@ -115,7 +115,7 @@
                       <i class="fas fa-arrow-up"></i> Growth
                     </th>
                     <th class="col-revenue">
-                      <i class="fas fa-dollar-sign"></i> Avg. Revenue / N.P.
+                      <i class="fas fa-dollar-sign"></i> Avg. $/NP
                     </th>
                     <th class="col-growth-total">
                       <i class="fas fa-chart-simple"></i> Growth Total
@@ -131,13 +131,10 @@
             <!-- Investment and Return Cards -->
             <div class="metrics-cards">
               <div class="metric-card investment-card">
-                <div class="card-header">
-                  <h3>Investment</h3>
-                  <span class="date-range" id="investmentDateRange">Aug 24 - Jul 25</span>
-                </div>
-                <div class="card-value">
+                <div class="card-value-header">
                   <span id="investmentTotal">$14,587</span>
-                  <span class="period" id="investmentPeriod">/year</span>
+                  <span class="period" id="investmentPeriod">/month</span>
+                  <span class="card-title">Investment</span>
                 </div>
                 <div class="card-breakdown">
                   <div class="breakdown-chip">
@@ -153,13 +150,10 @@
               </div>
 
               <div class="metric-card return-card">
-                <div class="card-header">
-                  <h3>Return</h3>
-                  <span class="date-range" id="returnDateRange">Aug 24 - Jul 25</span>
-                </div>
-                <div class="card-value">
+                <div class="card-value-header">
                   <span id="returnTotal">$610,339</span>
-                  <span class="period" id="returnPeriod">/year</span>
+                  <span class="period" id="returnPeriod">/month</span>
+                  <span class="card-title">Return</span>
                 </div>
                 <div class="card-breakdown">
                   <div class="breakdown-chip">
@@ -168,6 +162,10 @@
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div class="metrics-note">
+              <p>* Calculated from the average of your provided stats between <span id="metricsDateRange">Aug 2024 - Jul 2025</span>.</p>
             </div>
 
           </section>
