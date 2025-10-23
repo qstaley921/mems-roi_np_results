@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
   updateTable(currentPeriod);
 
   // Tab button click handlers
-  const tabButtons = document.querySelectorAll('.tab-btn:not(.tab-btn-custom)');
+  const tabButtons = document.querySelectorAll('.tab-btn');
   tabButtons.forEach(btn => {
     btn.addEventListener('click', function() {
       // Remove active class from all buttons
@@ -149,70 +149,28 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Custom years dropdown handler
-  const customBtn = document.querySelector('.tab-btn-custom');
-  const customDropdown = document.querySelector('.custom-dropdown');
-  const dropdownValue = document.getElementById('dropdownValue');
-  const dropdownOptions = document.getElementById('dropdownOptions');
-  const dropdownOptionElements = document.querySelectorAll('.dropdown-option');
+  // Custom years select handler
+  const customYearsSelect = document.getElementById('customYearsSelect');
+  customYearsSelect.addEventListener('change', function() {
+    const years = parseInt(this.value);
+    customYearsValue = years;
 
-  // Toggle dropdown
-  customDropdown.addEventListener('click', function(e) {
-    e.stopPropagation();
-    this.classList.toggle('open');
-    dropdownOptions.classList.toggle('show');
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+    // Add active class to select
+    customYearsSelect.classList.add('active');
+
+    // Update table with custom period
+    currentPeriod = 'custom';
+    updateTable(currentPeriod, customYearsValue);
   });
 
-  // Handle option selection
-  dropdownOptionElements.forEach(option => {
-    option.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const value = parseInt(this.dataset.value);
-
-      // Update the displayed value
-      dropdownValue.textContent = value;
-      customYearsValue = value;
-
-      // Update selected state
-      dropdownOptionElements.forEach(opt => opt.classList.remove('selected'));
-      this.classList.add('selected');
-
-      // Close dropdown
-      customDropdown.classList.remove('open');
-      dropdownOptions.classList.remove('show');
-
-      // Activate the custom button and update table
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      customBtn.classList.add('active');
-      currentPeriod = 'custom';
-      updateTable(currentPeriod, customYearsValue);
+  // Remove active class from select when tab buttons are clicked
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      customYearsSelect.classList.remove('active');
     });
-  });
-
-  // Custom button click (outside dropdown)
-  customBtn.addEventListener('click', function(e) {
-    // Only trigger if not clicking dropdown
-    if (!customDropdown.contains(e.target)) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      currentPeriod = 'custom';
-      updateTable(currentPeriod, customYearsValue);
-    }
-  });
-
-  // Close dropdown when clicking outside
-  document.addEventListener('click', function(e) {
-    if (!customDropdown.contains(e.target)) {
-      customDropdown.classList.remove('open');
-      dropdownOptions.classList.remove('show');
-    }
-  });
-
-  // Set initial selected option
-  dropdownOptionElements.forEach(option => {
-    if (parseInt(option.dataset.value) === customYearsValue) {
-      option.classList.add('selected');
-    }
   });
 
   // View toggle handler
