@@ -4,48 +4,48 @@
 // New Patient Results Data (Monthly base values)
 const npData = {
   locations: [
-    // // {
-    // //   name: "Bradley Place",
-    // //   startAvg: 27,        // Monthly starting average
-    // //   newAvg: 35.08,       // Monthly new average
-    // //   avgRevenue: 2978,    // Average revenue per new patient
-    // //   durationMonths: 36   // Total months with company
-    // // },
-    // // {
-    // //   name: "East Lake",
-    // //   startAvg: 37.08,
-    // //   newAvg: 42.33,
-    // //   avgRevenue: 2101,
-    // //   durationMonths: 36
-    // // },
-    // {
-    //   name: "Fullerton",
-    //   startAvg: 22.92,
-    //   newAvg: 22.08,
-    //   avgRevenue: 2457,
-    //   durationMonths: 36
-    // },
-    // {
-    //   name: "Westside",
-    //   startAvg: 31.5,
-    //   newAvg: 38.75,
-    //   avgRevenue: 2650,
-    //   durationMonths: 36
-    // },
-    // {
-    //   name: "North Point",
-    //   startAvg: 19.25,
-    //   newAvg: 28.5,
-    //   avgRevenue: 2890,
-    //   durationMonths: 36
-    // },
-    // {
-    //   name: "Riverside",
-    //   startAvg: 42.0,
-    //   newAvg: 48.33,
-    //   avgRevenue: 2275,
-    //   durationMonths: 36
-    // },
+    {
+      name: "Bradley Place",
+      startAvg: 27,        // Monthly starting average
+      newAvg: 35.08,       // Monthly new average
+      avgRevenue: 2978,    // Average revenue per new patient
+      durationMonths: 36   // Total months with company
+    },
+    {
+      name: "East Lake",
+      startAvg: 37.08,
+      newAvg: 42.33,
+      avgRevenue: 2101,
+      durationMonths: 36
+    },
+    {
+      name: "Fullerton",
+      startAvg: 22.92,
+      newAvg: 22.08,
+      avgRevenue: 2457,
+      durationMonths: 36
+    },
+    {
+      name: "Westside",
+      startAvg: 31.5,
+      newAvg: 38.75,
+      avgRevenue: 2650,
+      durationMonths: 36
+    },
+    {
+      name: "North Point",
+      startAvg: 19.25,
+      newAvg: 28.5,
+      avgRevenue: 2890,
+      durationMonths: 36
+    },
+    {
+      name: "Riverside",
+      startAvg: 42.0,
+      newAvg: 48.33,
+      avgRevenue: 2275,
+      durationMonths: 36
+    },
     {
       name: "Downtown",
       startAvg: 35.67,

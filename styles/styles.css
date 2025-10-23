@@ -250,6 +250,10 @@ body {
   border: 1px solid #5a5a5a;
 }
 
+.tab-btn[data-period="total"] {
+  display: none;
+}
+
 /* Custom Years Select */
 .custom-years-select {
   background-color: transparent;
