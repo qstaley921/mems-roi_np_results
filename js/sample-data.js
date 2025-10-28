@@ -128,5 +128,57 @@ const sampleDataSets = {
     investment: {
       program: 399.08
     }
+  },
+
+  "Dr. Rencher": {
+    locations: [
+      {
+        name: "Twin Falls Smiles",
+        startAvg: 27,
+        newAvg: 68,
+        avgRevenue: 2959,
+        startDate: "2023-01-01"
+      }
+    ],
+    investment: {
+      program: 399.08
+    }
+  },
+
+  "Dr. Smudde": {
+    locations: [
+      {
+        name: "Santa Clarita Advanced Dentistry",
+        startAvg: 60,
+        newAvg: 62,
+        avgRevenue: 5811,
+        startDate: "2023-01-01"
+      }
+    ],
+    investment: {
+      program: 399.08
+    }
+  },
+
+  "Dr. Powers": {
+    locations: [
+      {
+        name: "Lyons",
+        startAvg: 17,
+        newAvg: 20,
+        avgRevenue: 4024,
+        startDate: "2023-01-01"
+      },
+      {
+        name: "Terre Haute",
+        startAvg: 36,
+        newAvg: 37,
+        avgRevenue: 2901,
+        startDate: "2023-01-01"
+      }
+    ],
+    investment: {
+      program: 399.08
+    }
   }
 };
