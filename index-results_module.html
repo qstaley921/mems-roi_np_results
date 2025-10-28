@@ -79,6 +79,21 @@
               </select>
               </div>
 
+              <!-- Location Selector (shown only in graph view) -->
+              <div class="location-selector-header" id="locationSelectorHeader" style="display: none;">
+                <i class="fas fa-map-marker-alt"></i>
+                <select class="location-select" id="locationSelect">
+                  <option value="all">All locations</option>
+                  <option value="bradley-place">Bradley Place</option>
+                  <option value="east-lake">East Lake</option>
+                  <option value="fullerton">Fullerton</option>
+                  <option value="westside">Westside</option>
+                  <option value="north-point">North Point</option>
+                  <option value="riverside">Riverside</option>
+                  <option value="downtown">Downtown</option>
+                </select>
+              </div>
+
               <div class="panel-actions">
                 <div class="view-toggle active-table" id="viewToggle">
                   <div class="toggle-track">
@@ -98,7 +113,7 @@
             </div>
 
             <!-- Data Table -->
-            <div class="data-table-container">
+            <div class="data-table-container" id="tableView">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -128,8 +143,70 @@
               </table>
             </div>
 
+            <!-- Graph View -->
+            <div class="graph-view-container" id="graphView" style="display: none;">
+              <!-- Graph Content Area -->
+              <div class="graph-content">
+                <!-- Chart Area -->
+                <div class="chart-container">
+                  <!-- Graph Header with Growth Input -->
+                  <div class="graph-header">
+                    <h2 class="graph-title">
+                      What if I grew my new patients by
+                      <input type="number" id="growthInput" class="growth-input" value="10" min="0" max="100" step="1" oninput="this.value = this.value < 0 ? 0 : this.value" />%
+                      each year?
+                    </h2>
+                    <p class="graph-subtitle">Your current average new patient growth is <span id="currentGrowthRate">10%</span></p>
+                  </div>
+
+                  <!-- Fixed Ticker Display (Absolutely Positioned) -->
+                  <div class="ticker-display" id="tickerDisplay">
+                    <div class="ticker-display-year-header" id="tickerDisplayYear">2024</div>
+                    <div class="ticker-display-content">
+                      <div class="ticker-display-section">
+                        <div class="ticker-display-label">Member average</div>
+                        <div class="ticker-display-value ticker-display-value-member" id="tickerDisplayMemberValue">
+                          $3,133,961 <span class="ticker-display-percent" id="tickerDisplayMemberPercent">(+14%)</span>
+                        </div>
+                      </div>
+                      <div class="ticker-display-section">
+                        <div class="ticker-display-label">Starting average</div>
+                        <div class="ticker-display-value ticker-display-value-start" id="tickerDisplayStartValue">
+                          $2,679,360 <span class="ticker-display-percent">(+0%)</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <canvas id="collectionsChart"></canvas>
+                </div>
+              </div>
+
+              <!-- Graph Legend Footer -->
+              <div class="graph-legend-footer">
+                <div class="legend-items">
+                  <div class="legend-item">
+                    <span class="legend-color legend-color-square" style="background-color: #000000;"></span>
+                    <span class="legend-label">Start: <span id="legendStartYear">2021</span></span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color" style="background-color: #9e9e9e;"></span>
+                    <span class="legend-label">Start Avg. <span class="legend-percent">(+0%)</span></span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color" style="background-color: #4caf50;"></span>
+                    <span class="legend-label">Member Avg. <span class="legend-percent legend-percent-green" id="legendMemberPercent">(+10%)</span></span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color" style="background-color: #90caf9;"></span>
+                    <span class="legend-label">Projected Avg. <span class="legend-percent legend-percent-blue" id="legendProjectedPercent">(+10%)</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Investment and Return Cards -->
-            <div class="metrics-cards">
+            <div class="metrics-cards" id="metricsCards">
               <div class="metric-card investment-card">
                 <div class="card-value-header">
                   <span id="investmentTotal">$14,587</span>
@@ -164,11 +241,12 @@
               </div>
             </div>
 
-            <div class="metrics-note">
-              <p>* Calculated from the average of your provided stats between <span id="metricsDateRange">Aug 2024 - Jul 2025</span>.</p>
-            </div>
-
           </section>
+
+          <!-- Panel Footnote (shows different text based on view) -->
+          <div class="panel-footnote" id="panelFootnote">
+            <p id="footnoteText">*This table shows average numbers and will not match your actual collections exactly.</p>
+          </div>
         </div>
 
         <!-- Right Column: Quick Links -->
@@ -184,6 +262,7 @@
 
   <!-- Scripts -->
   <script src="https://members.mypgi.com/min/g=new-ms-js?v=0.62"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="js/results-module.js"></script>
 </body>
 </html>
