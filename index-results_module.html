@@ -57,7 +57,8 @@
               <button class="tab-btn" data-period="yearly">Yearly</button>
               <button class="tab-btn" data-period="total">Total</button>
               <select class="custom-years-select" id="customYearsSelect">
-                <option value="3" selected>3 Years</option>
+                <option value="" selected disabled>X Years</option>
+                <option value="3">3 Years</option>
                 <option value="5">5 Years</option>
                 <option value="10">10 Years</option>
               </select>
@@ -139,7 +140,7 @@
                       What if we had
                       <span class="growth-input-wrapper"><input type="number" id="growthInput" class="growth-input" value="49" min="0" step="1" oninput="this.value = this.value < 0 ? 0 : this.value" /></span>
                       monthly new patients?
-                      <button class="reset-btn" id="resetBtn">Reset</button>
+                      <button class="reset-btn" id="resetBtn"><i class="fas fa-undo"></i></button>
                     </h2>
                     <p class="graph-subtitle"><span id="currentAverage">49</span> is the current average. <span id="adjustedAverage">51</span> is a <span id="percentChange">4%</span> increase.</p>
                   </div>
