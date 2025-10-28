@@ -79,6 +79,21 @@
               </select>
               </div>
 
+              <!-- Location Selector (shown only in graph view) -->
+              <div class="location-selector-header" id="locationSelectorHeader" style="display: none;">
+                <i class="fas fa-map-marker-alt"></i>
+                <select class="location-select" id="locationSelect">
+                  <option value="all">All locations</option>
+                  <option value="bradley-place">Bradley Place</option>
+                  <option value="east-lake">East Lake</option>
+                  <option value="fullerton">Fullerton</option>
+                  <option value="westside">Westside</option>
+                  <option value="north-point">North Point</option>
+                  <option value="riverside">Riverside</option>
+                  <option value="downtown">Downtown</option>
+                </select>
+              </div>
+
               <div class="panel-actions">
                 <div class="view-toggle active-table" id="viewToggle">
                   <div class="toggle-track">
@@ -98,7 +113,7 @@
             </div>
 
             <!-- Data Table -->
-            <div class="data-table-container">
+            <div class="data-table-container" id="tableView">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -128,8 +143,68 @@
               </table>
             </div>
 
+            <!-- Graph View -->
+            <div class="graph-view-container" id="graphView" style="display: none;">
+              <!-- Graph Content Area -->
+              <div class="graph-content">
+                <!-- Chart Area -->
+                <div class="chart-container">
+                  <!-- Graph Header with Growth Input -->
+                  <div class="graph-header">
+                    <h2 class="graph-title">
+                      What if I grew my new patients by
+                      <input type="number" id="growthInput" class="growth-input" value="10" min="0" max="100" step="1" />%
+                      each year?
+                    </h2>
+                    <p class="graph-subtitle">Your current average new patient growth is <span id="currentGrowthRate">10%</span></p>
+                  </div>
+
+                  <canvas id="collectionsChart"></canvas>
+
+                  <!-- Draggable Ticker (hidden for now, will build after graph) -->
+                  <div class="ticker" id="ticker" style="display: none;">
+                    <div class="ticker-line"></div>
+                    <div class="ticker-handle">
+                      <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="ticker-tooltip">
+                      <div class="tooltip-title">Cumulative collections</div>
+                      <div class="tooltip-item member-avg">
+                        <span class="tooltip-value" id="tickerMemberValue">$3,245,809</span>
+                        <span class="tooltip-label">Member Avg. Numbers</span>
+                        <span class="tooltip-percent" id="tickerMemberPercent">(+16%)</span>
+                      </div>
+                      <div class="tooltip-item starting-avg">
+                        <span class="tooltip-value" id="tickerStartValue">$2,789,876</span>
+                        <span class="tooltip-label">Starting Avg. Numbers</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Graph Legend Footer -->
+              <div class="graph-legend-footer">
+                <div class="legend-items">
+                  <div class="legend-item">
+                    <span class="legend-color" style="background-color: #9e9e9e;"></span>
+                    <span class="legend-label">Start Avg. <span class="legend-percent">(+0%)</span></span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color" style="background-color: #4caf50;"></span>
+                    <span class="legend-label">Member Avg. <span class="legend-percent legend-percent-green" id="legendMemberPercent">(+10%)</span></span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color" style="background-color: #81c784;"></span>
+                    <span class="legend-label">Projected Avg. <span class="legend-percent legend-percent-green" id="legendProjectedPercent">(+10%)</span></span>
+                  </div>
+                </div>
+                <p class="graph-note">*This graph shows average numbers and will not match your actual collections exactly.</p>
+              </div>
+            </div>
+
             <!-- Investment and Return Cards -->
-            <div class="metrics-cards">
+            <div class="metrics-cards" id="metricsCards">
               <div class="metric-card investment-card">
                 <div class="card-value-header">
                   <span id="investmentTotal">$14,587</span>
@@ -164,8 +239,8 @@
               </div>
             </div>
 
-            <div class="metrics-note">
-              <p>* Calculated from the average of your provided stats between <span id="metricsDateRange">Aug 2024 - Jul 2025</span>.</p>
+            <div class="metrics-note" id="metricsNote">
+              <p>*This table shows average numbers and will not match your actual collections exactly.</p>
             </div>
 
           </section>

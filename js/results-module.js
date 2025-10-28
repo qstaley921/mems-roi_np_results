@@ -214,6 +214,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // View toggle handler
   const viewToggle = document.getElementById('viewToggle');
   const toggleBall = viewToggle.querySelector('.toggle-ball');
+  const tableView = document.getElementById('tableView');
+  const graphView = document.getElementById('graphView');
+  const timePeriodTabs = document.querySelector('.time-period-tabs');
+  const locationSelectorHeader = document.getElementById('locationSelectorHeader');
+  const metricsCards = document.getElementById('metricsCards');
+  const metricsNote = document.getElementById('metricsNote');
   let currentView = 'table';
 
   viewToggle.addEventListener('click', function() {
@@ -236,7 +242,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update ball content
         toggleBall.innerHTML = '<i class="fas fa-chart-simple"></i><span>Graph</span>';
 
-        // TODO: Show graph view, hide table view
+        // Show graph view, hide table view and metrics
+        tableView.style.display = 'none';
+        graphView.style.display = 'flex';
+        timePeriodTabs.style.display = 'none';
+        locationSelectorHeader.style.display = 'flex';
+        metricsCards.style.display = 'none';
+        metricsNote.style.display = 'none';
+
         console.log('Switched to graph view');
       } else {
         // Switch to table
@@ -249,7 +262,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update ball content
         toggleBall.innerHTML = '<i class="fas fa-table"></i><span>Table</span>';
 
-        // TODO: Show table view, hide graph view
+        // Show table view, hide graph view, show metrics
+        tableView.style.display = 'block';
+        graphView.style.display = 'none';
+        timePeriodTabs.style.display = 'flex';
+        locationSelectorHeader.style.display = 'none';
+        metricsCards.style.display = 'grid';
+        metricsNote.style.display = 'block';
+
         console.log('Switched to table view');
       }
 

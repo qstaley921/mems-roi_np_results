@@ -63,7 +63,8 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 400px;
+  height: 500px;
+  max-height: 500px;
 }
 
 /* Panel Header */
@@ -81,6 +82,43 @@ body {
   position: relative;
   overflow: visible;
   z-index: 40;
+}
+
+/* Location Selector in Header */
+.location-selector-header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.location-selector-header i {
+  color: #2d2d2d;
+  font-size: 15px;
+  max-width: 15px;
+}
+
+.location-select {
+  background-color: transparent;
+  color: #2d2d2d;
+  border: 1px solid #d0d0d0;
+  padding: 0.5rem 1rem;
+  border-radius: 4px !important;
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+  min-width: 180px;
+}
+
+.location-select:hover {
+  background-color: #e0e0e0;
+  border: 1px solid #d0d0d0;
+}
+
+.location-select:focus {
+  outline: none;
+  border-color: #4a4a4a;
 }
 
 
@@ -623,6 +661,316 @@ body {
 
   .quick-links-panel {
     margin-top: 2rem;
+  }
+}
+
+/* ============================================
+   Graph View Styles
+   ============================================ */
+
+/* Graph View Container */
+.graph-view-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Graph Content */
+.graph-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+.graph-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.graph-content::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.graph-content::-webkit-scrollbar-thumb {
+  background: rgba(192, 192, 192, 0.5);
+  border-radius: 4px;
+}
+
+.graph-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(160, 160, 160, 0.5);
+}
+
+/* Chart Container */
+.chart-container {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+/* Graph Header - Centered in chart area */
+.graph-header {
+  text-align: center;
+  padding: 1rem 2rem;
+  margin: 0 auto;
+  max-width: 800px;
+  flex-shrink: 0;
+}
+
+.graph-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.growth-input {
+  width: 60px;
+  padding: 0.25rem 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #4caf50;
+  border: 2px solid #4caf50;
+  border-radius: 4px;
+  text-align: center;
+  background-color: #f0f9f1;
+}
+
+.growth-input:focus {
+  outline: none;
+  border-color: #45a049;
+  background-color: #ffffff;
+}
+
+.graph-subtitle {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Canvas */
+#collectionsChart {
+  width: 100% !important;
+  height: 100% !important;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Graph Legend Footer */
+.graph-legend-footer {
+  background-color: #ffffff;
+  border-top: 1px solid #d0d0d0;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.graph-legend-footer .legend-items {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.graph-legend-footer .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.graph-legend-footer .legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.graph-legend-footer .legend-label {
+  font-weight: 500;
+}
+
+.graph-legend-footer .legend-percent {
+  font-weight: 400;
+  color: #666;
+}
+
+.graph-legend-footer .legend-percent-green {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.graph-legend-footer .graph-note {
+  font-size: 0.75rem;
+  color: #999;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Ticker */
+.ticker {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  cursor: grab;
+}
+
+.ticker:active {
+  cursor: grabbing;
+}
+
+.ticker-line {
+  width: 2px;
+  height: 400px;
+  background-color: #2d2d2d;
+  margin: 0 auto;
+}
+
+.ticker-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  background-color: #2d2d2d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.ticker-handle i {
+  font-size: 12px;
+}
+
+/* Ticker Tooltip */
+.ticker-tooltip {
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2d2d2d;
+  color: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  min-width: 250px;
+  white-space: nowrap;
+}
+
+.ticker-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #2d2d2d;
+}
+
+.tooltip-title {
+  font-size: 0.75rem;
+  color: #ccc;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tooltip-item {
+  margin-bottom: 0.5rem;
+}
+
+.tooltip-item:last-child {
+  margin-bottom: 0;
+}
+
+.tooltip-item.member-avg .tooltip-value {
+  color: #4caf50;
+}
+
+.tooltip-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.tooltip-label {
+  font-size: 0.75rem;
+  color: #ccc;
+  display: block;
+}
+
+.tooltip-percent {
+  font-size: 0.875rem;
+  color: #4caf50;
+  margin-left: 0.5rem;
+}
+
+/* Responsive Graph View */
+@media (max-width: 991px) {
+  .results-panel {
+    height: auto;
+    max-height: none;
+  }
+
+  .graph-header {
+    padding: 1rem;
+  }
+
+  .graph-title {
+    font-size: 1.25rem;
+  }
+
+  .growth-input {
+    width: 50px;
+    font-size: 1.25rem;
+  }
+
+  .graph-legend-footer {
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .graph-legend-footer .legend-items {
+    gap: 1rem;
+  }
+
+  .location-selector-header {
+    flex-wrap: wrap;
+  }
+
+  .location-select {
+    min-width: 140px;
+  }
+
+  .chart-container {
+    padding: 1rem;
   }
 }
 
