@@ -199,7 +199,6 @@
                     <span class="legend-label">Projected Avg. <span class="legend-percent legend-percent-green" id="legendProjectedPercent">(+10%)</span></span>
                   </div>
                 </div>
-                <p class="graph-note">*This graph shows average numbers and will not match your actual collections exactly.</p>
               </div>
             </div>
 
@@ -239,11 +238,12 @@
               </div>
             </div>
 
-            <div class="metrics-note" id="metricsNote">
-              <p>*This table shows average numbers and will not match your actual collections exactly.</p>
-            </div>
-
           </section>
+
+          <!-- Panel Footnote (shows different text based on view) -->
+          <div class="panel-footnote" id="panelFootnote">
+            <p id="footnoteText">*This table shows average numbers and will not match your actual collections exactly.</p>
+          </div>
         </div>
 
         <!-- Right Column: Quick Links -->
@@ -259,6 +259,7 @@
 
   <!-- Scripts -->
   <script src="https://members.mypgi.com/min/g=new-ms-js?v=0.62"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="js/results-module.js"></script>
 </body>
 </html>

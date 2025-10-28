@@ -9,49 +9,49 @@ const npData = {
       startAvg: 27,        // Monthly starting average
       newAvg: 35.08,       // Monthly new average
       avgRevenue: 2978,    // Average revenue per new patient
-      durationMonths: 36   // Total months with company
+      startDate: "2022-01-01"  // Program start date
     },
     {
       name: "East Lake",
       startAvg: 37.08,
       newAvg: 42.33,
       avgRevenue: 2101,
-      durationMonths: 36
+      startDate: "2022-01-01"
     },
     {
       name: "Fullerton",
       startAvg: 22.92,
       newAvg: 22.08,
       avgRevenue: 2457,
-      durationMonths: 36
+      startDate: "2022-01-01"
     },
     {
       name: "Westside",
       startAvg: 31.5,
       newAvg: 38.75,
       avgRevenue: 2650,
-      durationMonths: 36
+      startDate: "2022-01-01"
     },
     {
       name: "North Point",
       startAvg: 19.25,
       newAvg: 28.5,
       avgRevenue: 2890,
-      durationMonths: 36
+      startDate: "2022-01-01"
     },
     {
       name: "Riverside",
       startAvg: 42.0,
       newAvg: 48.33,
       avgRevenue: 2275,
-      durationMonths: 36
+      startDate: "2022-01-01"
     },
     {
       name: "Downtown",
       startAvg: 35.67,
       newAvg: 41.92,
       avgRevenue: 3100,
-      durationMonths: 36
+      startDate: "2022-01-01"
     }
   ],
   investment: {
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const timePeriodTabs = document.querySelector('.time-period-tabs');
   const locationSelectorHeader = document.getElementById('locationSelectorHeader');
   const metricsCards = document.getElementById('metricsCards');
-  const metricsNote = document.getElementById('metricsNote');
+  const footnoteText = document.getElementById('footnoteText');
   let currentView = 'table';
 
   viewToggle.addEventListener('click', function() {
@@ -248,7 +248,11 @@ document.addEventListener('DOMContentLoaded', function() {
         timePeriodTabs.style.display = 'none';
         locationSelectorHeader.style.display = 'flex';
         metricsCards.style.display = 'none';
-        metricsNote.style.display = 'none';
+
+        // Update footnote text for graph
+        if (footnoteText) {
+          footnoteText.textContent = '*This graph shows average numbers and will not match your actual collections exactly.';
+        }
 
         console.log('Switched to graph view');
       } else {
@@ -268,7 +272,11 @@ document.addEventListener('DOMContentLoaded', function() {
         timePeriodTabs.style.display = 'flex';
         locationSelectorHeader.style.display = 'none';
         metricsCards.style.display = 'grid';
-        metricsNote.style.display = 'block';
+
+        // Update footnote text for table
+        if (footnoteText) {
+          footnoteText.textContent = '*This table shows average numbers and will not match your actual collections exactly.';
+        }
 
         console.log('Switched to table view');
       }
@@ -289,4 +297,270 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Initialize toggle state
   viewToggle.classList.add('active-table');
+
+  // ============================================
+  // GRAPH FUNCTIONALITY
+  // ============================================
+
+  let collectionsChart = null;
+  let currentGrowthRate = 10; // Default growth rate percentage
+
+  // Helper function to get months between two dates
+  function getMonthsBetween(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+  }
+
+  // Helper function to add months to a date
+  function addMonths(date, months) {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + months);
+    return d;
+  }
+
+  // Calculate graph data for a location
+  function calculateGraphData(location, growthRate) {
+    const today = new Date();
+    const startDate = new Date(location.startDate);
+    const endDate = new Date(today);
+    endDate.setFullYear(endDate.getFullYear() + 10); // Add 10 years to current date
+
+    // Calculate total months in timeline
+    const totalMonths = getMonthsBetween(startDate, endDate);
+    const monthsToPresent = getMonthsBetween(startDate, today);
+
+    // Determine if we use quarters or years based on total years
+    const totalYears = totalMonths / 12;
+    const useQuarters = totalYears <= 15; // Use quarters if 15 years or less
+
+    // Generate time periods
+    const periods = [];
+    const periodLength = useQuarters ? 3 : 12; // 3 months for quarters, 12 for years
+    const periodCount = Math.ceil(totalMonths / periodLength);
+
+    // Calculate actual member growth rate (from start to present)
+    const actualGrowthRate = location.startAvg > 0
+      ? ((location.newAvg - location.startAvg) / location.startAvg) * 100
+      : 0;
+
+    // Generate data for each period
+    const startAvgData = [];
+    const memberAvgData = [];
+    const projectedAvgData = [];
+    const labels = [];
+
+    for (let i = 0; i <= periodCount; i++) {
+      const periodStartMonth = i * periodLength;
+      const periodDate = addMonths(startDate, periodStartMonth);
+      const isPast = periodDate <= today;
+
+      // Generate label
+      if (useQuarters) {
+        const quarter = Math.floor((periodDate.getMonth()) / 3) + 1;
+        const year = periodDate.getFullYear();
+        labels.push(`Q${quarter} ${year}`);
+      } else {
+        labels.push(periodDate.getFullYear().toString());
+      }
+
+      // Starting average collections (always flat)
+      const startCollections = location.startAvg * periodLength * location.avgRevenue;
+      startAvgData.push(startCollections);
+
+      if (isPast) {
+        // Historical data: use actual member average
+        const memberCollections = location.newAvg * periodLength * location.avgRevenue;
+        memberAvgData.push(memberCollections);
+        projectedAvgData.push(null); // No projection for past data
+      } else {
+        // Future data: use compound growth from current member average
+        const yearsFromNow = (periodStartMonth - monthsToPresent) / 12;
+        const growthMultiplier = Math.pow(1 + (growthRate / 100), yearsFromNow);
+        const projectedNewPatients = location.newAvg * growthMultiplier;
+        const projectedCollections = projectedNewPatients * periodLength * location.avgRevenue;
+
+        memberAvgData.push(null); // No member data for future
+        projectedAvgData.push(projectedCollections);
+      }
+    }
+
+    return {
+      labels,
+      startAvgData,
+      memberAvgData,
+      projectedAvgData,
+      actualGrowthRate,
+      useQuarters
+    };
+  }
+
+  // Calculate aggregated data for all locations
+  function calculateAggregateGraphData(growthRate) {
+    // Find earliest start date
+    const earliestStart = npData.locations.reduce((earliest, loc) => {
+      const locDate = new Date(loc.startDate);
+      return !earliest || locDate < earliest ? locDate : earliest;
+    }, null);
+
+    // Calculate averages across all locations
+    const avgStartAvg = npData.locations.reduce((sum, loc) => sum + loc.startAvg, 0) / npData.locations.length;
+    const avgNewAvg = npData.locations.reduce((sum, loc) => sum + loc.newAvg, 0) / npData.locations.length;
+    const avgRevenue = npData.locations.reduce((sum, loc) => sum + loc.avgRevenue, 0) / npData.locations.length;
+
+    const aggregateLocation = {
+      name: "All Locations",
+      startAvg: avgStartAvg,
+      newAvg: avgNewAvg,
+      avgRevenue: avgRevenue,
+      startDate: earliestStart.toISOString().split('T')[0]
+    };
+
+    return calculateGraphData(aggregateLocation, growthRate);
+  }
+
+  // Initialize Chart
+  function initializeChart() {
+    const ctx = document.getElementById('collectionsChart');
+    if (!ctx) return;
+
+    const graphData = calculateAggregateGraphData(currentGrowthRate);
+
+    collectionsChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: graphData.labels,
+        datasets: [
+          {
+            label: 'Starting Average',
+            data: graphData.startAvgData,
+            backgroundColor: '#9e9e9e',
+            borderRadius: 4,
+            barThickness: 'flex',
+            maxBarThickness: 40
+          },
+          {
+            label: 'Member Average',
+            data: graphData.memberAvgData,
+            backgroundColor: '#4caf50',
+            borderRadius: 4,
+            barThickness: 'flex',
+            maxBarThickness: 40
+          },
+          {
+            label: 'Projected Average',
+            data: graphData.projectedAvgData,
+            backgroundColor: '#81c784',
+            borderRadius: 4,
+            barThickness: 'flex',
+            maxBarThickness: 40
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: '#2d2d2d',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#4caf50',
+            borderWidth: 1,
+            padding: 12,
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                let label = context.dataset.label || '';
+                if (label) {
+                  label += ': ';
+                }
+                if (context.parsed.y !== null) {
+                  label += '$' + context.parsed.y.toLocaleString();
+                }
+                return label;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              maxRotation: 45,
+              minRotation: 45,
+              font: {
+                size: 10
+              }
+            }
+          },
+          y: {
+            display: false,
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Update chart with new growth rate
+  function updateChart(growthRate) {
+    if (!collectionsChart) return;
+
+    const graphData = calculateAggregateGraphData(growthRate);
+
+    collectionsChart.data.labels = graphData.labels;
+    collectionsChart.data.datasets[0].data = graphData.startAvgData;
+    collectionsChart.data.datasets[1].data = graphData.memberAvgData;
+    collectionsChart.data.datasets[2].data = graphData.projectedAvgData;
+
+    collectionsChart.update();
+
+    // Update legend percentages
+    const memberPercent = document.getElementById('legendMemberPercent');
+    const projectedPercent = document.getElementById('legendProjectedPercent');
+    const currentGrowthRateSpan = document.getElementById('currentGrowthRate');
+
+    if (memberPercent) {
+      memberPercent.textContent = `(+${Math.round(graphData.actualGrowthRate)}%)`;
+    }
+    if (projectedPercent) {
+      projectedPercent.textContent = `(+${growthRate}%)`;
+    }
+    if (currentGrowthRateSpan) {
+      currentGrowthRateSpan.textContent = `${Math.round(graphData.actualGrowthRate)}%`;
+    }
+  }
+
+  // Growth input handler
+  const growthInput = document.getElementById('growthInput');
+  if (growthInput) {
+    growthInput.addEventListener('input', function() {
+      const value = parseFloat(this.value) || 0;
+      currentGrowthRate = Math.max(0, Math.min(100, value)); // Clamp between 0-100
+      updateChart(currentGrowthRate);
+    });
+  }
+
+  // Initialize chart when graph view is first shown
+  const originalViewToggleClick = viewToggle.onclick;
+  viewToggle.addEventListener('click', function() {
+    setTimeout(() => {
+      if (currentView === 'graph' && !collectionsChart) {
+        initializeChart();
+        updateChart(currentGrowthRate);
+      }
+    }, 300);
+  });
 });

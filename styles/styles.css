@@ -340,7 +340,7 @@ body {
   overflow-x: auto;
   overflow-y: auto;
   margin: -0.5rem 0 0.5rem 0;
-  max-height: 250px;
+  max-height: 280px;
   position: relative;
   border-bottom: 1px solid #d0d0d0;
 }
@@ -529,7 +529,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
-  padding: 1.5rem 1.5rem;
+  padding: 0.75rem 1.5rem 1.5rem 1.5rem;
   margin-top: auto;
 }
 
@@ -622,16 +622,16 @@ body {
   flex-shrink: 0;
 }
 
-/* Metrics Note */
-.metrics-note {
-  padding: 0 1.5rem 1.5rem 1.5rem;
+/* Panel Footnote (outside results panel) */
+.panel-footnote {
+  padding: 0.75rem 0 0 1.5rem;
 }
 
-.metrics-note p {
+.panel-footnote p {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-style: italic;
-  color: #666;
+  color: #999;
 }
 
 /* Quick Links Panel */
@@ -792,13 +792,13 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: #666;
 }
 
 .graph-legend-footer .legend-color {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 2px;
   display: inline-block;
 }
@@ -815,13 +815,6 @@ body {
 .graph-legend-footer .legend-percent-green {
   color: #4caf50;
   font-weight: 600;
-}
-
-.graph-legend-footer .graph-note {
-  font-size: 0.75rem;
-  color: #999;
-  margin: 0;
-  font-style: italic;
 }
 
 /* Ticker */
