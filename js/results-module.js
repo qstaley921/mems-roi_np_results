@@ -302,13 +302,19 @@ document.addEventListener('DOMContentLoaded', function() {
 let collectionsChart = null;
 let currentMonthlyAverage = 49; // Default current average (will be set from selected location)
 let adjustedMonthlyAverage = 49; // User's adjusted value
+let defaultAdjustedAverage = 49; // Default +10% value (will be set from current average)
 
 // Get current average from selected location
 function getCurrentAverageFromLocation() {
   const locationSelect = document.getElementById('locationSelect');
   const selectedValue = locationSelect ? locationSelect.value : 'north-point';
 
-  // Find the location
+  // If "all locations" selected, sum all location averages
+  if (selectedValue === 'all') {
+    return npData.locations.reduce((sum, loc) => sum + loc.newAvg, 0);
+  }
+
+  // Find the specific location
   const location = npData.locations.find(loc =>
     loc.name.toLowerCase().replace(/\s+/g, '-') === selectedValue
   );
@@ -372,7 +378,8 @@ function initializeChart() {
   currentMonthlyAverage = getCurrentAverageFromLocation();
 
   // Set default adjusted value to current + 10%, rounded up
-  adjustedMonthlyAverage = Math.ceil(currentMonthlyAverage * 1.1);
+  defaultAdjustedAverage = Math.ceil(currentMonthlyAverage * 1.1);
+  adjustedMonthlyAverage = defaultAdjustedAverage;
 
   // Set input to adjusted average (current + 10%)
   const growthInput = document.getElementById('growthInput');
@@ -380,8 +387,11 @@ function initializeChart() {
     growthInput.value = adjustedMonthlyAverage;
   }
 
-  // Update subtitle
-  updateSubtitle(currentMonthlyAverage, adjustedMonthlyAverage);
+  // Hide reset button initially (starts at default)
+  updateResetButtonVisibility(adjustedMonthlyAverage);
+
+  // Update subtitle (initial year = 1)
+  updateSubtitle(currentMonthlyAverage, adjustedMonthlyAverage, 1);
 
   const graphData = calculateSimpleGraphData(adjustedMonthlyAverage);
 
@@ -472,27 +482,42 @@ function updateChart(newAdjustedAvg) {
   // Update input styling
   const growthInput = document.getElementById('growthInput');
   if (growthInput) {
-    growthInput.classList.remove('input-modified', 'input-decrease');
-    if (graphData.isDecrease) {
+    growthInput.classList.remove('input-neutral', 'input-decrease');
+    if (newAdjustedAvg === currentMonthlyAverage) {
+      // No change - gray
+      growthInput.classList.add('input-neutral');
+    } else if (graphData.isDecrease) {
+      // Decrease - red
       growthInput.classList.add('input-decrease');
-    } else if (newAdjustedAvg !== currentMonthlyAverage) {
-      growthInput.classList.add('input-modified');
     }
+    // Else: positive change - default green (no class needed)
   }
 
-  // Update subtitle
-  updateSubtitle(currentMonthlyAverage, newAdjustedAvg);
+  // Update reset button visibility
+  updateResetButtonVisibility(newAdjustedAvg);
 
   collectionsChart.update('none');
 
-  // Update ticker display
+  // Update ticker display (which will also update subtitle with correct years)
   if (typeof updateTickerDisplayFn === 'function') {
     updateTickerDisplayFn(currentTickerIndex);
   }
 }
 
+// Update reset button visibility based on whether value differs from default
+function updateResetButtonVisibility(currentValue) {
+  const resetBtn = document.getElementById('resetBtn');
+  if (resetBtn) {
+    if (currentValue === defaultAdjustedAverage) {
+      resetBtn.style.display = 'none';
+    } else {
+      resetBtn.style.display = 'inline-block';
+    }
+  }
+}
+
 // Update subtitle text
-function updateSubtitle(currentAvg, adjustedAvg) {
+function updateSubtitle(currentAvg, adjustedAvg, yearsElapsed = 1) {
   const currentAvgSpan = document.getElementById('currentAverage');
   const adjustedAvgSpan = document.getElementById('adjustedAverage');
   const percentChangeSpan = document.getElementById('percentChange');
@@ -503,20 +528,49 @@ function updateSubtitle(currentAvg, adjustedAvg) {
   if (percentChangeSpan) {
     const percentChange = ((adjustedAvg - currentAvg) / currentAvg) * 100;
     const isDecrease = percentChange < 0;
+    const isNoChange = adjustedAvg === currentAvg;
     const absPercent = Math.abs(Math.round(percentChange));
 
     percentChangeSpan.textContent = `${absPercent}%`;
-    percentChangeSpan.style.color = isDecrease ? '#f44336' : '#4caf50';
 
-    // Update the "increase/decrease" text
+    // Calculate collections difference based on years elapsed (cumulative)
+    const revenue = npData.locations[0].avgRevenue;
+    const currentAnnualCollections = currentAvg * 12 * revenue;
+    const adjustedAnnualCollections = adjustedAvg * 12 * revenue;
+
+    // Cumulative collections for the selected year
+    let cumulativeCurrentCollections = 0;
+    let cumulativeAdjustedCollections = 0;
+    for (let i = 0; i < yearsElapsed; i++) {
+      cumulativeCurrentCollections += currentAnnualCollections;
+      cumulativeAdjustedCollections += adjustedAnnualCollections;
+    }
+
+    const collectionsDifference = cumulativeAdjustedCollections - cumulativeCurrentCollections;
+    const absCollectionsDiff = Math.abs(Math.round(collectionsDifference));
+
+    // Determine color and text
+    let changeColor, changeText, collectionText;
+    if (isNoChange) {
+      changeColor = '#9e9e9e';
+      changeText = 'no change';
+      collectionText = '';
+    } else if (isDecrease) {
+      changeColor = '#f44336';
+      changeText = 'decrease';
+      collectionText = `, creating <span style="color: ${changeColor}">-$${absCollectionsDiff.toLocaleString()}</span> in lost collections`;
+    } else {
+      changeColor = '#4caf50';
+      changeText = 'increase';
+      collectionText = `, creating <span style="color: ${changeColor}">$${absCollectionsDiff.toLocaleString()}</span> in added collections`;
+    }
+
+    percentChangeSpan.style.color = changeColor;
+
+    // Update subtitle
     const subtitleText = document.querySelector('.graph-subtitle');
     if (subtitleText) {
-      const text = subtitleText.innerHTML;
-      if (isDecrease) {
-        subtitleText.innerHTML = text.replace(' increase.', ' decrease.');
-      } else {
-        subtitleText.innerHTML = text.replace(' decrease.', ' increase.');
-      }
+      subtitleText.innerHTML = `<span id="currentAverage">${Math.round(currentAvg)}</span> is the current average. <span id="adjustedAverage">${Math.round(adjustedAvg)}</span> is a <span id="percentChange" style="color: ${changeColor}">${absPercent}%</span> ${changeText}${collectionText}.`;
     }
   }
 }
@@ -558,15 +612,35 @@ function initializeTicker() {
     const year = graphData.labels[index];
     const adjustedValue = graphData.adjustedAvgData[index];
     const currentValue = graphData.currentAvgData[index];
+    const yearsElapsed = index + 1; // Years from start (1-based)
 
     // Update year
     document.getElementById('tickerDisplayYear').textContent = year;
 
-    // Update values
-    document.getElementById('tickerDisplayAdjustedValue').textContent =
-      '$' + Math.round(adjustedValue).toLocaleString();
-    document.getElementById('tickerDisplayCurrentValue').textContent =
-      '$' + Math.round(currentValue).toLocaleString();
+    // Update labels with detailed descriptions
+    const adjustedLabel = document.getElementById('tickerDisplayAdjustedLabel');
+    const currentLabel = document.getElementById('tickerDisplayCurrentLabel');
+
+    if (adjustedLabel) {
+      adjustedLabel.textContent = `Collections at ${Math.round(adjustedMonthlyAverage)}/month for ${yearsElapsed} Year${yearsElapsed > 1 ? 's' : ''}`;
+    }
+    if (currentLabel) {
+      currentLabel.textContent = `Collections at ${Math.round(currentMonthlyAverage)}/month for ${yearsElapsed} Year${yearsElapsed > 1 ? 's' : ''}`;
+    }
+
+    // Update values with colors
+    const adjustedValueElement = document.getElementById('tickerDisplayAdjustedValue');
+    const currentValueElement = document.getElementById('tickerDisplayCurrentValue');
+
+    if (adjustedValueElement) {
+      adjustedValueElement.textContent = '$' + Math.round(adjustedValue).toLocaleString();
+      adjustedValueElement.style.color = graphData.isDecrease ? '#f44336' : '#4caf50';
+    }
+
+    if (currentValueElement) {
+      currentValueElement.textContent = '$' + Math.round(currentValue).toLocaleString();
+      currentValueElement.style.color = '#666666';
+    }
 
     // Update ticker display background
     tickerDisplay.classList.remove('is-member', 'is-projected');
@@ -577,21 +651,22 @@ function initializeTicker() {
       tickerDisplay.style.background = '';
     }
 
-    // Update bar opacity
-    const bars = collectionsChart.getDatasetMeta(0).data.concat(
-      collectionsChart.getDatasetMeta(1).data
+    // Update bar opacity - set active group to 100%, others to 25%
+    const dataset0 = collectionsChart.data.datasets[0];
+    const dataset1 = collectionsChart.data.datasets[1];
+
+    // Update dataset colors with opacity
+    dataset0.backgroundColor = graphData.labels.map((_, i) =>
+      i === index ? 'rgba(158, 158, 158, 1)' : 'rgba(158, 158, 158, 0.25)'
     );
 
-    bars.forEach((bar, i) => {
-      const barIndex = Math.floor(i / 2);
-      bar.options.backgroundColor = bar.options.backgroundColor;
+    const adjustedColorRGB = graphData.isDecrease ? '244, 67, 54' : '76, 175, 80';
+    dataset1.backgroundColor = graphData.labels.map((_, i) =>
+      i === index ? `rgba(${adjustedColorRGB}, 1)` : `rgba(${adjustedColorRGB}, 0.25)`
+    );
 
-      if (barIndex === index) {
-        bar.options.opacity = 1;
-      } else {
-        bar.options.opacity = 0.5;
-      }
-    });
+    // Update subtitle with years elapsed
+    updateSubtitle(currentMonthlyAverage, adjustedMonthlyAverage, yearsElapsed);
 
     collectionsChart.update('none');
   };
@@ -625,8 +700,61 @@ if (growthInput) {
 const resetBtn = document.getElementById('resetBtn');
 if (resetBtn) {
   resetBtn.addEventListener('click', function() {
-    growthInput.value = Math.round(currentMonthlyAverage);
-    updateChart(currentMonthlyAverage);
+    growthInput.value = defaultAdjustedAverage;
+    updateChart(defaultAdjustedAverage);
+  });
+}
+
+// Location selector change handler
+const locationSelect = document.getElementById('locationSelect');
+if (locationSelect) {
+  locationSelect.addEventListener('change', function() {
+    if (!collectionsChart) return; // Only handle if chart is initialized
+
+    // Recalculate current average from new location
+    currentMonthlyAverage = getCurrentAverageFromLocation();
+
+    // Recalculate default adjusted value (current + 10%, rounded up)
+    defaultAdjustedAverage = Math.ceil(currentMonthlyAverage * 1.1);
+    adjustedMonthlyAverage = defaultAdjustedAverage;
+
+    // Update input value
+    if (growthInput) {
+      growthInput.value = defaultAdjustedAverage;
+    }
+
+    // Recalculate graph data
+    const graphData = calculateSimpleGraphData(adjustedMonthlyAverage);
+
+    // Update chart datasets
+    collectionsChart.data.datasets[0].data = graphData.currentAvgData;
+    collectionsChart.data.datasets[1].data = graphData.adjustedAvgData;
+    collectionsChart.data.datasets[1].backgroundColor = graphData.adjustedColor;
+
+    // Update legend color
+    const legendAdjustedColor = document.getElementById('legendAdjustedColor');
+    if (legendAdjustedColor) {
+      legendAdjustedColor.style.backgroundColor = graphData.adjustedColor;
+    }
+
+    // Update input styling
+    if (growthInput) {
+      growthInput.classList.remove('input-neutral', 'input-decrease');
+      // New default is always increase, so no special class
+    }
+
+    // Update reset button visibility (should be hidden at default)
+    updateResetButtonVisibility(adjustedMonthlyAverage);
+
+    // Reset to first year
+    currentTickerIndex = 0;
+
+    // Update ticker display and subtitle
+    if (typeof updateTickerDisplayFn === 'function') {
+      updateTickerDisplayFn(currentTickerIndex);
+    }
+
+    collectionsChart.update();
   });
 }
 
