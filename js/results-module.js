@@ -55,17 +55,16 @@ const npData = {
     }
   ],
   investment: {
-    training: 816.5,     // Monthly training investment
-    program: 399.08      // Monthly program investment
+    program: 399.08      // Monthly program investment per month
   }
 };
 
 // Current selected period
 let currentPeriod = 'monthly';
-let customYearsValue = 2;
+let customYearsValue = 3;
 
 // Calculation functions
-function calculateMetrics(period, customYears = 2) {
+function calculateMetrics(period, customYears = 3) {
   const multiplier = getMultiplier(period, customYears);
   const periodLabel = getPeriodLabel(period, customYears);
 
@@ -89,8 +88,7 @@ function calculateMetrics(period, customYears = 2) {
 
   // Calculate totals
   const totalGrowth = results.reduce((sum, loc) => sum + loc.growth, 0);
-  const totalInvestment = (npData.investment.training + npData.investment.program) * multiplier;
-  const trainingInvestment = npData.investment.training * multiplier;
+  const totalInvestment = npData.investment.program * multiplier;
   const programInvestment = npData.investment.program * multiplier;
   const totalReturn = results.reduce((sum, loc) => sum + loc.growthTotal, 0);
 
@@ -98,7 +96,6 @@ function calculateMetrics(period, customYears = 2) {
     locations: results,
     totalGrowth,
     totalInvestment,
-    trainingInvestment,
     programInvestment,
     totalReturn,
     periodLabel
@@ -159,8 +156,8 @@ function updateTable(period, customYears = 2) {
   // Update investment and return cards
   document.getElementById('investmentTotal').textContent = `$${Math.round(metrics.totalInvestment).toLocaleString()}`;
   document.getElementById('investmentPeriod').textContent = metrics.periodLabel;
-  document.getElementById('investmentTraining').textContent = `$${Math.round(metrics.trainingInvestment).toLocaleString()}`;
-  document.getElementById('investmentProgram').textContent = `$${Math.round(metrics.programInvestment).toLocaleString()}`;
+  // Investment program breakdown always shows fixed monthly cost
+  document.getElementById('investmentProgram').textContent = `$${Math.round(npData.investment.program).toLocaleString()}/month`;
 
   document.getElementById('returnTotal').textContent = `$${Math.round(metrics.totalReturn).toLocaleString()}`;
   document.getElementById('returnPeriod').textContent = metrics.periodLabel;
