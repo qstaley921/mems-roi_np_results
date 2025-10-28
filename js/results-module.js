@@ -634,6 +634,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       updateChart(currentGrowthRate, currentLocation);
+
+      // Update ticker display with new growth rate
+      if (updateTickerPositionFn && collectionsChart) {
+        updateTickerPositionFn(currentTickerIndex);
+      }
     });
   }
 
@@ -643,11 +648,15 @@ document.addEventListener('DOMContentLoaded', function() {
     locationSelect.addEventListener('change', function() {
       currentLocation = this.value;
       updateChart(currentGrowthRate, currentLocation);
+
+      // Update ticker display with new location data
+      if (updateTickerPositionFn && collectionsChart) {
+        updateTickerPositionFn(currentTickerIndex);
+      }
     });
   }
 
   // Initialize chart when graph view is first shown
-  const originalViewToggleClick = viewToggle.onclick;
   viewToggle.addEventListener('click', function() {
     setTimeout(() => {
       if (currentView === 'graph' && !collectionsChart) {
@@ -664,13 +673,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   let isDragging = false;
   let currentTickerIndex = 0;
+  let updateTickerPositionFn = null;
 
   function initializeTicker() {
     if (!collectionsChart) return;
 
     const ticker = document.getElementById('ticker');
     const tickerNub = document.getElementById('tickerNub');
-    const tickerHighlight = ticker.querySelector('.ticker-highlight');
     const tickerTooltip = document.getElementById('tickerTooltip');
     const canvas = collectionsChart.canvas;
 
@@ -683,16 +692,14 @@ document.addEventListener('DOMContentLoaded', function() {
     currentTickerIndex = labels.indexOf(currentYearLabel);
     if (currentTickerIndex === -1) currentTickerIndex = Math.floor(labels.length / 2);
 
-    // Update ticker position
+    // Update ticker position and store the function
+    updateTickerPositionFn = updateTickerPosition;
     updateTickerPosition(currentTickerIndex);
 
     // Drag functionality on nub
-    let dragStartX = 0;
-
     tickerNub.addEventListener('mousedown', function(e) {
       e.preventDefault();
       isDragging = true;
-      dragStartX = e.clientX;
       tickerNub.style.cursor = 'grabbing';
     });
 
@@ -763,69 +770,99 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function updateTickerPosition(index) {
-      const labels = collectionsChart.data.labels;
+      // Get the actual visible bar (Member Average or Projected Average)
+      // Dataset 1 = Member Average (green), Dataset 2 = Projected Average (blue)
+      const memberValue = collectionsChart.data.datasets[1].data[index];
+      const projectedValue = collectionsChart.data.datasets[2].data[index];
 
-      // Get the highest bar at this index (could be from any dataset)
-      let highestBarMeta = null;
-      let highestValue = 0;
+      let targetBarMeta = null;
 
-      for (let datasetIndex = 0; datasetIndex < collectionsChart.data.datasets.length; datasetIndex++) {
-        const meta = collectionsChart.getDatasetMeta(datasetIndex);
-        const value = collectionsChart.data.datasets[datasetIndex].data[index];
-
-        if (value !== null && value > highestValue) {
-          highestValue = value;
-          highestBarMeta = meta.data[index];
-        }
+      // Use member bar if it exists (past data), otherwise use projected bar (future data)
+      if (memberValue !== null) {
+        targetBarMeta = collectionsChart.getDatasetMeta(1).data[index];
+      } else if (projectedValue !== null) {
+        targetBarMeta = collectionsChart.getDatasetMeta(2).data[index];
       }
 
-      if (!highestBarMeta) return;
+      if (!targetBarMeta) return;
 
-      const barX = highestBarMeta.x;
-      const barY = highestBarMeta.y;
+      const barX = targetBarMeta.x; // Horizontal center of the bar in pixels
+      const barY = targetBarMeta.y; // Top of the bar in pixels from canvas top
+      const barBase = targetBarMeta.base; // Bottom of the bar in pixels from canvas top
+      const barHeight = barBase - barY; // Actual bar height in pixels
       const chartArea = collectionsChart.chartArea;
-      const barWidth = highestBarMeta.width || 40;
 
-      // Calculate bar height (from bar top to chart bottom)
-      const barHeight = chartArea.bottom - barY;
+      // Add manual offset before constraining
+      const adjustedBarX = barX + 10;
 
-      // Position highlight centered on bar, with height matching the bar
-      tickerHighlight.style.left = `${barX - barWidth / 2}px`;
-      tickerHighlight.style.width = `${barWidth}px`;
-      tickerHighlight.style.height = `${barHeight}px`;
+      // Constrain X position to stay within chart boundaries (10px padding from edges)
+      const constrainedX = Math.max(chartArea.left + 10, Math.min(adjustedBarX, chartArea.right - 10));
 
-      // Position nub at the top of the bar
-      tickerNub.style.left = `${barX}px`;
-      tickerNub.style.top = `${barY}px`;
+      // Position nub based on bar dimensions
+      tickerNub.style.left = `${constrainedX}px`;
+      tickerNub.style.top = `${barY}px`; // Exact top of bar
 
       // Get values for this index
       const startValue = collectionsChart.data.datasets[0].data[index];
-      const memberValue = collectionsChart.data.datasets[1].data[index];
-      const projectedValue = collectionsChart.data.datasets[2].data[index];
 
       // Determine which value to show (member or projected)
       const topValue = projectedValue !== null ? projectedValue : memberValue;
       const bottomValue = startValue;
+      const isProjected = projectedValue !== null;
 
       // Update tooltip values
-      document.getElementById('tickerTopValue').textContent = topValue ? `$${Math.round(topValue).toLocaleString()}` : '$0';
-      document.getElementById('tickerBottomValue').textContent = bottomValue ? `$${Math.round(bottomValue).toLocaleString()}` : '$0';
+      const topValueElement = document.getElementById('tickerTopValue');
+      const bottomValueElement = document.getElementById('tickerBottomValue');
+
+      topValueElement.textContent = topValue ? `$${Math.round(topValue).toLocaleString()}` : '$0';
+      bottomValueElement.textContent = bottomValue ? `$${Math.round(bottomValue).toLocaleString()}` : '$0';
+
+      // Update top value color based on whether it's projected (blue) or member (green)
+      topValueElement.style.color = isProjected ? '#90caf9' : '#4caf50';
 
       // Position tooltip above the bar
-      const threshold = chartArea.right - 100; // Right edge threshold
+      // Estimate tooltip width (actual width is ~140-160px)
+      const tooltipWidth = 160;
+      const tooltipHeight = 70;
+      const edgePadding = 20; // Minimum distance from chart edges
+      const rightEdgeThreshold = 80; // Distance from right edge to switch to side positioning
 
-      tickerTooltip.style.left = `${barX}px`;
+      // Calculate boundaries
+      const leftBoundary = chartArea.left + edgePadding;
+      const rightBoundary = chartArea.right - edgePadding;
 
-      // Switch between top and left positioning based on horizontal space
-      if (barX > threshold) {
-        tickerTooltip.classList.remove('position-top');
-        tickerTooltip.classList.add('position-left');
+      // Calculate where the centered tooltip would be
+      const centeredLeft = barX - tooltipWidth / 2;
+      const centeredRight = barX + tooltipWidth / 2;
+
+      // Determine positioning class based on overflow
+      tickerTooltip.classList.remove('position-top', 'position-top-left', 'position-top-right', 'position-right');
+
+      // Check if we're very close to the right edge
+      if (constrainedX > chartArea.right - rightEdgeThreshold) {
+        // Very close to right edge - position tooltip to the left of nub with right-pointing caret
+        tickerTooltip.classList.add('position-right');
+        tickerTooltip.style.left = `${constrainedX}px`;
         tickerTooltip.style.top = `${barY}px`;
+      } else if (centeredLeft < leftBoundary) {
+        // Too close to left edge - align tooltip to left of nub
+        tickerTooltip.classList.add('position-top-left');
+        tickerTooltip.style.left = `${constrainedX}px`;
+        tickerTooltip.style.top = `${barY - tooltipHeight}px`;
+      } else if (centeredRight > rightBoundary) {
+        // Close to right edge - align tooltip to right of nub
+        tickerTooltip.classList.add('position-top-right');
+        tickerTooltip.style.left = `${constrainedX}px`;
+        tickerTooltip.style.top = `${barY - tooltipHeight}px`;
       } else {
-        tickerTooltip.classList.remove('position-left');
+        // Normal centered position
         tickerTooltip.classList.add('position-top');
-        tickerTooltip.style.top = `${barY - 60}px`; // Position above the bar
+        tickerTooltip.style.left = `${constrainedX}px`;
+        tickerTooltip.style.top = `${barY - tooltipHeight}px`;
       }
     }
+
+    // Return updateTickerPosition so it can be called from location change
+    return updateTickerPosition;
   }
 });
