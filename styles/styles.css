@@ -1102,6 +1102,34 @@ body {
     max-height: 550px;
   }
 
+  /* Hide full-height location separator line on smaller viewports */
+  .data-table-container::before {
+    display: none;
+  }
+
+  /* Add right borders to individual location cells instead */
+  .data-table thead th:first-child::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #d0d0d0;
+    z-index: 32;
+  }
+
+  .data-table tbody td:first-child::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #d0d0d0;
+    z-index: 7;
+  }
+
   .graph-header {
     padding: 1rem;
   }
