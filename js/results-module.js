@@ -295,678 +295,347 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize toggle state
   viewToggle.classList.add('active-table');
 
-  // ============================================
-  // GRAPH FUNCTIONALITY
-  // ============================================
+// ============================================
+// SIMPLIFIED GRAPH FUNCTIONALITY
+// ============================================
 
-  let collectionsChart = null;
-  let currentGrowthRate = null; // Will be set to actual member growth rate
-  let currentLocation = 'all'; // Default to all locations
+let collectionsChart = null;
+let currentMonthlyAverage = 49; // Default current average (will be set from selected location)
+let adjustedMonthlyAverage = 49; // User's adjusted value
 
-  // Helper function to convert kebab-case location value to proper case name
-  function getLocationName(locationValue) {
-    if (locationValue === 'all') return 'all';
+// Get current average from selected location
+function getCurrentAverageFromLocation() {
+  const locationSelect = document.getElementById('locationSelect');
+  const selectedValue = locationSelect ? locationSelect.value : 'north-point';
 
-    const nameMap = {
-      'bradley-place': 'Bradley Place',
-      'east-lake': 'East Lake',
-      'fullerton': 'Fullerton',
-      'westside': 'Westside',
-      'north-point': 'North Point',
-      'riverside': 'Riverside',
-      'downtown': 'Downtown'
-    };
+  // Find the location
+  const location = npData.locations.find(loc =>
+    loc.name.toLowerCase().replace(/\s+/g, '-') === selectedValue
+  );
 
-    return nameMap[locationValue] || locationValue;
+  return location ? location.newAvg : 49;
+}
+
+// Calculate simple graph data (cumulative)
+function calculateSimpleGraphData(adjustedAvg) {
+  const currentYear = new Date().getFullYear();
+  const years = 11; // Current year + 10 years
+
+  const labels = [];
+  const currentAvgData = [];
+  const adjustedAvgData = [];
+
+  // Get current average from location
+  const currentAvg = currentMonthlyAverage;
+
+  // Cumulative totals
+  let cumulativeCurrent = 0;
+  let cumulativeAdjusted = 0;
+
+  for (let i = 0; i < years; i++) {
+    const year = currentYear + i;
+    labels.push(year.toString());
+
+    // Annual collections: monthly average × 12 months × revenue
+    const currentAnnualCollections = currentAvg * 12 * npData.locations[0].avgRevenue;
+    const adjustedAnnualCollections = adjustedAvg * 12 * npData.locations[0].avgRevenue;
+
+    // Add to cumulative totals
+    cumulativeCurrent += currentAnnualCollections;
+    cumulativeAdjusted += adjustedAnnualCollections;
+
+    currentAvgData.push(cumulativeCurrent);
+    adjustedAvgData.push(cumulativeAdjusted);
   }
 
-  // Helper function to get months between two dates
-  function getMonthsBetween(startDate, endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    return (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
-  }
+  // Determine if we're in red state (adjusted < current)
+  const isDecrease = adjustedAvg < currentAvg;
+  const adjustedColor = isDecrease ? '#f44336' : '#4caf50';
 
-  // Helper function to add months to a date
-  function addMonths(date, months) {
-    const d = new Date(date);
-    d.setMonth(d.getMonth() + months);
-    return d;
-  }
+  return {
+    labels,
+    currentAvgData,
+    adjustedAvgData,
+    adjustedColor,
+    isDecrease,
+    currentAvg,
+    adjustedAvg
+  };
+}
 
-  // Calculate graph data for a location
-  function calculateGraphData(location, growthRate) {
-    const today = new Date();
-    const startDate = new Date(location.startDate);
-    const endDate = new Date(today);
-    endDate.setFullYear(endDate.getFullYear() + 10); // Cap at 10 years out from today
+// Initialize Chart
+function initializeChart() {
+  const ctx = document.getElementById('collectionsChart');
+  if (!ctx) return;
 
-    // Calculate total months in timeline
-    const totalMonths = getMonthsBetween(startDate, endDate);
-    const monthsToPresent = getMonthsBetween(startDate, today);
+  // Get current average from selected location
+  currentMonthlyAverage = getCurrentAverageFromLocation();
 
-    // Always use yearly periods
-    const periodLength = 12; // 12 months for years
-    const periodCount = Math.ceil(totalMonths / periodLength);
+  // Set default adjusted value to current + 10%, rounded up
+  adjustedMonthlyAverage = Math.ceil(currentMonthlyAverage * 1.1);
 
-    // Calculate actual member growth rate (from start to present)
-    const actualGrowthRate = location.startAvg > 0
-      ? ((location.newAvg - location.startAvg) / location.startAvg) * 100
-      : 0;
-
-    // Calculate annual growth rate from actual growth
-    const monthsElapsed = monthsToPresent;
-    const yearsElapsed = monthsElapsed / 12;
-    const annualMemberGrowthRate = yearsElapsed > 0
-      ? (Math.pow(location.newAvg / location.startAvg, 1 / yearsElapsed) - 1) * 100
-      : 0;
-
-    // Generate data for each period
-    const startAvgData = [];
-    const memberAvgData = [];
-    const projectedAvgData = [];
-    const labels = [];
-
-    let cumulativeStartCollections = 0;
-    let cumulativeMemberCollections = 0;
-    let cumulativeProjectedCollections = 0;
-    let lastMemberValue = 0;
-
-    for (let i = 0; i <= periodCount; i++) {
-      const periodStartMonth = i * periodLength;
-      const periodDate = addMonths(startDate, periodStartMonth);
-
-      // Check if this year is in the past (current year included as past/member data)
-      const periodYear = periodDate.getFullYear();
-      const currentYear = today.getFullYear();
-      const isPast = periodYear <= currentYear;
-
-      // Generate abbreviated year label (e.g., '22, '23, '24)
-      const year = periodDate.getFullYear();
-      const abbreviatedYear = `'${year.toString().slice(-2)}`;
-      labels.push(abbreviatedYear);
-
-      // Calculate years from start for compound growth
-      const yearsFromStart = periodStartMonth / 12;
-
-      // Starting average collections (grows with compound of 0% - stays flat per period, but cumulative)
-      const startNewPatients = location.startAvg;
-      const startPeriodCollections = startNewPatients * periodLength * location.avgRevenue;
-      cumulativeStartCollections += startPeriodCollections;
-      startAvgData.push(cumulativeStartCollections);
-
-      if (isPast) {
-        // Historical data: use actual member average with compound growth
-        const growthMultiplier = Math.pow(1 + (annualMemberGrowthRate / 100), yearsFromStart);
-        const memberNewPatients = location.startAvg * growthMultiplier;
-        const memberPeriodCollections = memberNewPatients * periodLength * location.avgRevenue;
-        cumulativeMemberCollections += memberPeriodCollections;
-        memberAvgData.push(cumulativeMemberCollections);
-        projectedAvgData.push(null); // No projection for past data
-        lastMemberValue = cumulativeMemberCollections; // Track last member value
-      } else {
-        // Future data: use compound growth from current member average
-        // Initialize projected from last member value on first future period
-        if (cumulativeProjectedCollections === 0) {
-          cumulativeProjectedCollections = lastMemberValue;
-        }
-
-        const yearsFromNow = (periodStartMonth - monthsToPresent) / 12;
-        const currentNewPatients = location.newAvg;
-        const growthMultiplier = Math.pow(1 + (growthRate / 100), yearsFromNow);
-        const projectedNewPatients = currentNewPatients * growthMultiplier;
-        const projectedPeriodCollections = projectedNewPatients * periodLength * location.avgRevenue;
-
-        cumulativeProjectedCollections += projectedPeriodCollections;
-
-        memberAvgData.push(null); // No member data for future
-        projectedAvgData.push(cumulativeProjectedCollections);
-      }
-    }
-
-    return {
-      labels,
-      startAvgData,
-      memberAvgData,
-      projectedAvgData,
-      actualGrowthRate
-    };
-  }
-
-  // Calculate aggregated data for all locations
-  function calculateAggregateGraphData(growthRate) {
-    // Find earliest start date
-    const earliestStart = npData.locations.reduce((earliest, loc) => {
-      const locDate = new Date(loc.startDate);
-      return !earliest || locDate < earliest ? locDate : earliest;
-    }, null);
-
-    const today = new Date();
-    const endDate = new Date(today);
-    endDate.setFullYear(endDate.getFullYear() + 10); // Cap at 10 years out from today
-
-    // Calculate total months in timeline
-    const totalMonths = getMonthsBetween(earliestStart, endDate);
-    const monthsToPresent = getMonthsBetween(earliestStart, today);
-
-    // Always use yearly periods
-    const periodLength = 12; // 12 months for years
-    const periodCount = Math.ceil(totalMonths / periodLength);
-
-    // Calculate actual aggregate growth rate (weighted by current values)
-    const totalStartAvg = npData.locations.reduce((sum, loc) => sum + loc.startAvg, 0);
-    const totalNewAvg = npData.locations.reduce((sum, loc) => sum + loc.newAvg, 0);
-    const actualGrowthRate = totalStartAvg > 0
-      ? ((totalNewAvg - totalStartAvg) / totalStartAvg) * 100
-      : 0;
-
-    // Calculate annual growth rate
-    const monthsElapsed = monthsToPresent;
-    const yearsElapsed = monthsElapsed / 12;
-    const annualGrowthRate = yearsElapsed > 0
-      ? (Math.pow(totalNewAvg / totalStartAvg, 1 / yearsElapsed) - 1) * 100
-      : 0;
-
-    // Generate data for each period
-    const startAvgData = [];
-    const memberAvgData = [];
-    const projectedAvgData = [];
-    const labels = [];
-
-    let cumulativeStartCollections = 0;
-    let cumulativeMemberCollections = 0;
-    let cumulativeProjectedCollections = 0;
-    let lastMemberValue = 0;
-
-    for (let i = 0; i <= periodCount; i++) {
-      const periodStartMonth = i * periodLength;
-      const periodDate = addMonths(earliestStart, periodStartMonth);
-
-      // Check if this year is in the past (current year included as past/member data)
-      const periodYear = periodDate.getFullYear();
-      const currentYear = today.getFullYear();
-      const isPast = periodYear <= currentYear;
-
-      // Generate abbreviated year label
-      const year = periodDate.getFullYear();
-      const abbreviatedYear = `'${year.toString().slice(-2)}`;
-      labels.push(abbreviatedYear);
-
-      // Sum collections from all locations active during this period
-      let periodStartCollections = 0;
-      let periodMemberCollections = 0;
-      let periodProjectedCollections = 0;
-
-      npData.locations.forEach(location => {
-        const locationStart = new Date(location.startDate);
-
-        // Only include location if it has started by this period
-        if (periodDate >= locationStart) {
-          // Calculate months since this location started
-          const monthsSinceLocationStart = getMonthsBetween(locationStart, periodDate);
-          const yearsFromLocationStart = monthsSinceLocationStart / 12;
-
-          // Starting average for this location
-          const startNewPatients = location.startAvg;
-          const startCollections = startNewPatients * periodLength * location.avgRevenue;
-          periodStartCollections += startCollections;
-
-          if (isPast) {
-            // Historical data: use actual member average with compound growth
-            const growthMultiplier = Math.pow(1 + (annualGrowthRate / 100), yearsFromLocationStart);
-            const memberNewPatients = location.startAvg * growthMultiplier;
-            const memberCollections = memberNewPatients * periodLength * location.avgRevenue;
-            periodMemberCollections += memberCollections;
-          } else {
-            // Future data: project from current value
-            const monthsSincePresent = getMonthsBetween(today, periodDate);
-            const yearsFromNow = monthsSincePresent / 12;
-            const currentNewPatients = location.newAvg;
-            const growthMultiplier = Math.pow(1 + (growthRate / 100), yearsFromNow);
-            const projectedNewPatients = currentNewPatients * growthMultiplier;
-            const projectedCollections = projectedNewPatients * periodLength * location.avgRevenue;
-            periodProjectedCollections += projectedCollections;
-          }
-        }
-      });
-
-      // Add to cumulative totals
-      cumulativeStartCollections += periodStartCollections;
-      startAvgData.push(cumulativeStartCollections);
-
-      if (isPast) {
-        cumulativeMemberCollections += periodMemberCollections;
-        memberAvgData.push(cumulativeMemberCollections);
-        projectedAvgData.push(null);
-        lastMemberValue = cumulativeMemberCollections;
-      } else {
-        // Initialize projected from last member value on first future period
-        if (cumulativeProjectedCollections === 0) {
-          cumulativeProjectedCollections = lastMemberValue;
-        }
-
-        cumulativeProjectedCollections += periodProjectedCollections;
-        memberAvgData.push(null);
-        projectedAvgData.push(cumulativeProjectedCollections);
-      }
-    }
-
-    return {
-      labels,
-      startAvgData,
-      memberAvgData,
-      projectedAvgData,
-      actualGrowthRate
-    };
-  }
-
-  // Get graph data for selected location
-  function getGraphDataForSelection(locationValue, growthRate) {
-    if (locationValue === 'all') {
-      return calculateAggregateGraphData(growthRate);
-    } else {
-      // Find the specific location
-      const locationName = getLocationName(locationValue);
-      const location = npData.locations.find(loc => loc.name === locationName);
-
-      if (location) {
-        return calculateGraphData(location, growthRate);
-      } else {
-        console.error('Location not found:', locationName);
-        return calculateAggregateGraphData(growthRate);
-      }
-    }
-  }
-
-  // Initialize Chart
-  function initializeChart() {
-    const ctx = document.getElementById('collectionsChart');
-    if (!ctx) return;
-
-    // Get initial data to determine actual growth rate
-    const initialData = getGraphDataForSelection(currentLocation, 10); // Use temporary value
-    const actualGrowthRate = Math.round(initialData.actualGrowthRate);
-
-    // Set current growth rate to actual member growth rate
-    if (currentGrowthRate === null) {
-      currentGrowthRate = actualGrowthRate;
-
-      // Update the input field
-      const growthInput = document.getElementById('growthInput');
-      if (growthInput) {
-        growthInput.value = currentGrowthRate;
-      }
-    }
-
-    const graphData = getGraphDataForSelection(currentLocation, currentGrowthRate);
-
-    // Update legend start year
-    const legendStartYear = document.getElementById('legendStartYear');
-    if (legendStartYear && graphData.labels.length > 0) {
-      const firstYear = '20' + graphData.labels[0].replace("'", "");
-      legendStartYear.textContent = firstYear;
-    }
-
-    collectionsChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: graphData.labels,
-        datasets: [
-          {
-            label: 'Starting Average',
-            data: graphData.startAvgData,
-            backgroundColor: '#9e9e9e',
-            borderRadius: 0,
-            barPercentage: 1.0,
-            categoryPercentage: 1.0,
-            stack: 'stack0'
-          },
-          {
-            label: 'Member Average',
-            data: graphData.memberAvgData,
-            backgroundColor: '#4caf50',
-            borderRadius: 0,
-            barPercentage: 1.0,
-            categoryPercentage: 1.0,
-            stack: 'stack1'
-          },
-          {
-            label: 'Projected Average',
-            data: graphData.projectedAvgData,
-            backgroundColor: '#90caf9',
-            borderRadius: 0,
-            barPercentage: 1.0,
-            categoryPercentage: 1.0,
-            stack: 'stack1'
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-          intersect: false,
-          mode: 'index'
-        },
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            enabled: false
-          }
-        },
-        scales: {
-          x: {
-            stacked: false,
-            grid: {
-              display: false
-            },
-            ticks: {
-              maxRotation: 0,
-              minRotation: 0,
-              autoSkip: false,
-              font: function(context) {
-                // Make first label bold
-                return {
-                  size: 11,
-                  weight: context.index === 0 ? 700 : 500
-                };
-              },
-              color: function(context) {
-                // Make first label black, others gray
-                return context.index === 0 ? '#000000' : '#666';
-              },
-              padding: 8
-            }
-          },
-          y: {
-            stacked: false,
-            display: false,
-            grid: {
-              display: false
-            }
-          }
-        }
-      }
-    });
-  }
-
-  // Update chart with new growth rate or location
-  function updateChart(growthRate, locationValue = currentLocation) {
-    if (!collectionsChart) return;
-
-    const graphData = getGraphDataForSelection(locationValue, growthRate);
-
-    collectionsChart.data.labels = graphData.labels;
-    collectionsChart.data.datasets[0].data = graphData.startAvgData;
-    collectionsChart.data.datasets[1].data = graphData.memberAvgData;
-    collectionsChart.data.datasets[2].data = graphData.projectedAvgData;
-
-    collectionsChart.update();
-
-    // Update legend start year
-    const legendStartYear = document.getElementById('legendStartYear');
-    if (legendStartYear && graphData.labels.length > 0) {
-      const firstYear = '20' + graphData.labels[0].replace("'", "");
-      legendStartYear.textContent = firstYear;
-    }
-
-    // Update legend percentages
-    const memberPercent = document.getElementById('legendMemberPercent');
-    const projectedPercent = document.getElementById('legendProjectedPercent');
-    const currentGrowthRateSpan = document.getElementById('currentGrowthRate');
-
-    if (memberPercent) {
-      memberPercent.textContent = `(+${Math.round(graphData.actualGrowthRate)}%)`;
-    }
-    if (projectedPercent) {
-      projectedPercent.textContent = `(+${growthRate}%)`;
-    }
-    if (currentGrowthRateSpan) {
-      currentGrowthRateSpan.textContent = `${Math.round(graphData.actualGrowthRate)}%`;
-    }
-  }
-
-  // Growth input handler
+  // Set input to adjusted average (current + 10%)
   const growthInput = document.getElementById('growthInput');
   if (growthInput) {
-    growthInput.addEventListener('input', function() {
-      let value = parseFloat(this.value);
-
-      // Prevent negative numbers
-      if (value < 0) {
-        value = 0;
-        this.value = 0;
-      }
-
-      currentGrowthRate = Math.max(0, Math.min(100, value || 0)); // Clamp between 0-100
-
-      // Get current data to check actual growth rate
-      const graphData = getGraphDataForSelection(currentLocation, currentGrowthRate);
-      const actualGrowthRate = Math.round(graphData.actualGrowthRate);
-
-      // Change input color to blue if different from member average
-      if (currentGrowthRate !== actualGrowthRate) {
-        this.classList.add('input-modified');
-      } else {
-        this.classList.remove('input-modified');
-      }
-
-      updateChart(currentGrowthRate, currentLocation);
-
-      // Update ticker display with new growth rate
-      if (updateTickerDisplayFn && collectionsChart) {
-        updateTickerDisplayFn(currentTickerIndex);
-      }
-    });
+    growthInput.value = adjustedMonthlyAverage;
   }
 
-  // Location selector handler
-  const locationSelect = document.getElementById('locationSelect');
-  if (locationSelect) {
-    locationSelect.addEventListener('change', function() {
-      currentLocation = this.value;
-      updateChart(currentGrowthRate, currentLocation);
+  // Update subtitle
+  updateSubtitle(currentMonthlyAverage, adjustedMonthlyAverage);
 
-      // Update ticker display with new location data
-      if (updateTickerDisplayFn && collectionsChart) {
-        updateTickerDisplayFn(currentTickerIndex);
-      }
-    });
-  }
+  const graphData = calculateSimpleGraphData(adjustedMonthlyAverage);
 
-  // Initialize chart when graph view is first shown
-  viewToggle.addEventListener('click', function() {
-    setTimeout(() => {
-      if (currentView === 'graph' && !collectionsChart) {
-        initializeChart();
-        updateChart(currentGrowthRate);
-        initializeTicker();
+  collectionsChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: graphData.labels,
+      datasets: [
+        {
+          label: 'Current avg.',
+          data: graphData.currentAvgData,
+          backgroundColor: '#9e9e9e',
+          borderRadius: 0,
+          barPercentage: 0.8,
+          categoryPercentage: 0.9
+        },
+        {
+          label: 'Adjusted avg.',
+          data: graphData.adjustedAvgData,
+          backgroundColor: graphData.adjustedColor,
+          borderRadius: 0,
+          barPercentage: 0.8,
+          categoryPercentage: 0.9
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          enabled: false
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            font: {
+              size: 11,
+              weight: function(context) {
+                return context.index === 0 ? 700 : 500;
+              }
+            },
+            color: function(context) {
+              return context.index === 0 ? '#000000' : '#666';
+            }
+          }
+        },
+        y: {
+          display: false,
+          beginAtZero: true
+        }
       }
-    }, 300);
+    }
   });
 
-  // ============================================
-  // TICKER FUNCTIONALITY (Bar Selection)
-  // ============================================
+  // Initialize ticker
+  initializeTicker();
+}
 
-  let currentTickerIndex = 0;
-  let updateTickerDisplayFn = null;
+// Update chart with new adjusted value
+function updateChart(newAdjustedAvg) {
+  if (!collectionsChart) return;
 
-  function initializeTicker() {
-    if (!collectionsChart) return;
+  adjustedMonthlyAverage = newAdjustedAvg;
+  const graphData = calculateSimpleGraphData(newAdjustedAvg);
 
-    const tickerDisplay = document.getElementById('tickerDisplay');
-    const canvas = collectionsChart.canvas;
+  // Update dataset
+  collectionsChart.data.datasets[1].data = graphData.adjustedAvgData;
+  collectionsChart.data.datasets[1].backgroundColor = graphData.adjustedColor;
+
+  // Update legend color
+  const legendAdjustedColor = document.getElementById('legendAdjustedColor');
+  if (legendAdjustedColor) {
+    legendAdjustedColor.style.backgroundColor = graphData.adjustedColor;
+  }
+
+  // Update input styling
+  const growthInput = document.getElementById('growthInput');
+  if (growthInput) {
+    growthInput.classList.remove('input-modified', 'input-decrease');
+    if (graphData.isDecrease) {
+      growthInput.classList.add('input-decrease');
+    } else if (newAdjustedAvg !== currentMonthlyAverage) {
+      growthInput.classList.add('input-modified');
+    }
+  }
+
+  // Update subtitle
+  updateSubtitle(currentMonthlyAverage, newAdjustedAvg);
+
+  collectionsChart.update('none');
+
+  // Update ticker display
+  if (typeof updateTickerDisplayFn === 'function') {
+    updateTickerDisplayFn(currentTickerIndex);
+  }
+}
+
+// Update subtitle text
+function updateSubtitle(currentAvg, adjustedAvg) {
+  const currentAvgSpan = document.getElementById('currentAverage');
+  const adjustedAvgSpan = document.getElementById('adjustedAverage');
+  const percentChangeSpan = document.getElementById('percentChange');
+
+  if (currentAvgSpan) currentAvgSpan.textContent = Math.round(currentAvg);
+  if (adjustedAvgSpan) adjustedAvgSpan.textContent = Math.round(adjustedAvg);
+
+  if (percentChangeSpan) {
+    const percentChange = ((adjustedAvg - currentAvg) / currentAvg) * 100;
+    const isDecrease = percentChange < 0;
+    const absPercent = Math.abs(Math.round(percentChange));
+
+    percentChangeSpan.textContent = `${absPercent}%`;
+    percentChangeSpan.style.color = isDecrease ? '#f44336' : '#4caf50';
+
+    // Update the "increase/decrease" text
+    const subtitleText = document.querySelector('.graph-subtitle');
+    if (subtitleText) {
+      const text = subtitleText.innerHTML;
+      if (isDecrease) {
+        subtitleText.innerHTML = text.replace(' increase.', ' decrease.');
+      } else {
+        subtitleText.innerHTML = text.replace(' decrease.', ' increase.');
+      }
+    }
+  }
+}
+
+// Initialize ticker functionality
+let currentTickerIndex = 0;
+let updateTickerDisplayFn = null;
+
+function initializeTicker() {
+  const tickerDisplay = document.getElementById('tickerDisplay');
+  const canvas = collectionsChart.canvas;
+
+  if (!tickerDisplay || !canvas) return;
+
+  // Position ticker display
+  function positionTickerDisplay() {
     const graphHeader = document.querySelector('.graph-header');
-
-    if (!tickerDisplay || !canvas || !graphHeader) return;
-
-    // Position ticker display dynamically based on graph header height
-    function positionTickerDisplay() {
+    if (graphHeader) {
       const headerHeight = graphHeader.offsetHeight;
       tickerDisplay.style.top = `${headerHeight + 10}px`;
     }
+  }
 
-    // Initial positioning with delay to allow header to render
-    setTimeout(() => {
-      positionTickerDisplay();
-    }, 100);
+  setTimeout(() => {
+    positionTickerDisplay();
+  }, 100);
 
-    // Reposition on window resize
-    window.addEventListener('resize', positionTickerDisplay);
+  window.addEventListener('resize', positionTickerDisplay);
 
-    // Start at current year
-    const labels = collectionsChart.data.labels;
-    const currentYear = new Date().getFullYear();
-    const currentYearLabel = `'${currentYear.toString().slice(-2)}`;
-    currentTickerIndex = labels.indexOf(currentYearLabel);
-    if (currentTickerIndex === -1) currentTickerIndex = Math.floor(labels.length / 2);
+  // Set initial ticker to first year (current year)
+  currentTickerIndex = 0;
 
-    // Update ticker display and store the function
-    updateTickerDisplayFn = updateTickerDisplay;
-    updateTickerDisplay(currentTickerIndex);
+  // Update ticker display
+  updateTickerDisplayFn = function(index) {
+    const graphData = calculateSimpleGraphData(adjustedMonthlyAverage);
 
-    // Click on chart to select bar
-    canvas.addEventListener('click', function(e) {
-      // Use Chart.js built-in method to get elements at click position
-      const points = collectionsChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
+    if (index < 0 || index >= graphData.labels.length) return;
 
-      if (points.length > 0) {
-        // Get the index from the first clicked element
-        const clickedIndex = points[0].index;
+    const year = graphData.labels[index];
+    const adjustedValue = graphData.adjustedAvgData[index];
+    const currentValue = graphData.currentAvgData[index];
 
-        if (clickedIndex !== currentTickerIndex) {
-          currentTickerIndex = clickedIndex;
-          updateTickerDisplay(currentTickerIndex);
-        }
+    // Update year
+    document.getElementById('tickerDisplayYear').textContent = year;
+
+    // Update values
+    document.getElementById('tickerDisplayAdjustedValue').textContent =
+      '$' + Math.round(adjustedValue).toLocaleString();
+    document.getElementById('tickerDisplayCurrentValue').textContent =
+      '$' + Math.round(currentValue).toLocaleString();
+
+    // Update ticker display background
+    tickerDisplay.classList.remove('is-member', 'is-projected');
+    if (graphData.isDecrease) {
+      tickerDisplay.style.background = 'linear-gradient(135deg, #ffcdd2 0%, #ffebee 100%)';
+    } else {
+      tickerDisplay.classList.add('is-member');
+      tickerDisplay.style.background = '';
+    }
+
+    // Update bar opacity
+    const bars = collectionsChart.getDatasetMeta(0).data.concat(
+      collectionsChart.getDatasetMeta(1).data
+    );
+
+    bars.forEach((bar, i) => {
+      const barIndex = Math.floor(i / 2);
+      bar.options.backgroundColor = bar.options.backgroundColor;
+
+      if (barIndex === index) {
+        bar.options.opacity = 1;
       } else {
-        // If no bar was clicked, try to find nearest bar by x position
-        const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-
-        // Find nearest bar by x position
-        const meta = collectionsChart.getDatasetMeta(0);
-        let nearestIndex = 0;
-        let nearestDistance = Infinity;
-
-        for (let i = 0; i < meta.data.length; i++) {
-          const barMeta = meta.data[i];
-          if (!barMeta) continue;
-
-          const distance = Math.abs(clickX - barMeta.x);
-
-          if (distance < nearestDistance) {
-            nearestDistance = distance;
-            nearestIndex = i;
-          }
-        }
-
-        // Only update if click is reasonably close to a bar (within 50px)
-        if (nearestDistance < 50 && nearestIndex !== currentTickerIndex) {
-          currentTickerIndex = nearestIndex;
-          updateTickerDisplay(currentTickerIndex);
-        }
+        bar.options.opacity = 0.5;
       }
     });
 
-    function updateTickerDisplay(index) {
-      // Get the actual visible bar (Member Average or Projected Average)
-      // Dataset 1 = Member Average (green), Dataset 2 = Projected Average (blue)
-      const memberValue = collectionsChart.data.datasets[1].data[index];
-      const projectedValue = collectionsChart.data.datasets[2].data[index];
+    collectionsChart.update('none');
+  };
 
-      // Get values for this index
-      const startValue = collectionsChart.data.datasets[0].data[index];
-
-      // Determine which value to show (member or projected)
-      const topValue = projectedValue !== null ? projectedValue : memberValue;
-      const bottomValue = startValue;
-      const isProjected = projectedValue !== null;
-
-      // Get the year label for this index
-      const yearLabel = collectionsChart.data.labels[index];
-      const fullYear = '20' + yearLabel.replace("'", ""); // Convert '24 to 2024
-
-      // Update fixed ticker display
-      const tickerDisplayElement = document.getElementById('tickerDisplay');
-      const tickerDisplayYear = document.getElementById('tickerDisplayYear');
-      const tickerDisplayMemberValue = document.getElementById('tickerDisplayMemberValue');
-      const tickerDisplayStartValue = document.getElementById('tickerDisplayStartValue');
-
-      // Update ticker display background based on projected vs member
-      if (tickerDisplayElement) {
-        if (isProjected) {
-          tickerDisplayElement.classList.add('is-projected');
-          tickerDisplayElement.classList.remove('is-member');
-        } else {
-          tickerDisplayElement.classList.add('is-member');
-          tickerDisplayElement.classList.remove('is-projected');
-        }
+  // Click handler for bars
+  canvas.addEventListener('click', function(e) {
+    const points = collectionsChart.getElementsAtEventForMode(e, 'index', { intersect: false }, false);
+    if (points.length > 0) {
+      const clickedIndex = points[0].index;
+      if (clickedIndex !== currentTickerIndex) {
+        currentTickerIndex = clickedIndex;
+        updateTickerDisplayFn(currentTickerIndex);
       }
-
-      if (tickerDisplayYear) {
-        tickerDisplayYear.textContent = fullYear;
-      }
-
-      if (tickerDisplayMemberValue) {
-        const displayValue = topValue ? `$${Math.round(topValue).toLocaleString()}` : '$0';
-
-        // Update the member value - change label based on projected or member
-        const memberSection = tickerDisplayMemberValue.closest('.ticker-display-section');
-        const memberLabel = memberSection.querySelector('.ticker-display-label');
-
-        if (isProjected) {
-          memberLabel.textContent = 'Projected average';
-          tickerDisplayMemberValue.classList.add('is-projected');
-          tickerDisplayMemberValue.classList.remove('is-member');
-        } else {
-          memberLabel.textContent = 'Member average';
-          tickerDisplayMemberValue.classList.add('is-member');
-          tickerDisplayMemberValue.classList.remove('is-projected');
-        }
-
-        tickerDisplayMemberValue.textContent = displayValue;
-      }
-
-      if (tickerDisplayStartValue) {
-        tickerDisplayStartValue.textContent = `$${Math.round(bottomValue).toLocaleString()}`;
-      }
-
-      // Update bar opacity - selected bars at 100%, others at 50%
-      for (let datasetIndex = 0; datasetIndex < collectionsChart.data.datasets.length; datasetIndex++) {
-        const dataset = collectionsChart.data.datasets[datasetIndex];
-        const originalColor = datasetIndex === 0 ? '#9e9e9e' : datasetIndex === 1 ? '#4caf50' : '#90caf9';
-
-        // Create array of colors for each bar
-        dataset.backgroundColor = [];
-        for (let i = 0; i < collectionsChart.data.labels.length; i++) {
-          if (i === index) {
-            // Selected bar - full opacity
-            dataset.backgroundColor.push(originalColor);
-          } else {
-            // Unselected bars - 50% opacity
-            const rgb = hexToRgb(originalColor);
-            dataset.backgroundColor.push(`rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`);
-          }
-        }
-      }
-
-      collectionsChart.update('none'); // Update without animation
     }
+  });
 
-    // Helper function to convert hex to RGB
-    function hexToRgb(hex) {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-      } : { r: 0, g: 0, b: 0 };
+  // Initial display
+  updateTickerDisplayFn(currentTickerIndex);
+}
+
+// Growth input handler
+const growthInput = document.getElementById('growthInput');
+if (growthInput) {
+  growthInput.addEventListener('input', function() {
+    const value = parseInt(this.value) || 0;
+    updateChart(value);
+  });
+}
+
+// Reset button handler
+const resetBtn = document.getElementById('resetBtn');
+if (resetBtn) {
+  resetBtn.addEventListener('click', function() {
+    growthInput.value = Math.round(currentMonthlyAverage);
+    updateChart(currentMonthlyAverage);
+  });
+}
+
+// Initialize chart when graph view is shown
+viewToggle.addEventListener('click', function() {
+  setTimeout(() => {
+    if (currentView === 'graph' && !collectionsChart) {
+      initializeChart();
     }
-
-    // Return updateTickerDisplay so it can be called from location change
-    return updateTickerDisplay;
-  }
+  }, 300);
+});
 });
