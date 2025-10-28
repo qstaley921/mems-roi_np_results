@@ -159,18 +159,26 @@
                     <p class="graph-subtitle">Your current average new patient growth is <span id="currentGrowthRate">10%</span></p>
                   </div>
 
-                  <canvas id="collectionsChart"></canvas>
-
-                  <!-- Draggable Ticker -->
-                  <div class="ticker" id="ticker">
-                    <div class="ticker-tooltip position-top" id="tickerTooltip">
-                      <div class="tooltip-value" id="tickerTopValue">$###,###,###</div>
-                      <div class="tooltip-value" id="tickerBottomValue">$###,###,###</div>
-                    </div>
-                    <div class="ticker-nub" id="tickerNub">
-                      <div class="nub-circle"></div>
+                  <!-- Fixed Ticker Display (Absolutely Positioned) -->
+                  <div class="ticker-display" id="tickerDisplay">
+                    <div class="ticker-display-year-header" id="tickerDisplayYear">2024</div>
+                    <div class="ticker-display-content">
+                      <div class="ticker-display-section">
+                        <div class="ticker-display-label">Member average</div>
+                        <div class="ticker-display-value ticker-display-value-member" id="tickerDisplayMemberValue">
+                          $3,133,961 <span class="ticker-display-percent" id="tickerDisplayMemberPercent">(+14%)</span>
+                        </div>
+                      </div>
+                      <div class="ticker-display-section">
+                        <div class="ticker-display-label">Starting average</div>
+                        <div class="ticker-display-value ticker-display-value-start" id="tickerDisplayStartValue">
+                          $2,679,360 <span class="ticker-display-percent">(+0%)</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
+
+                  <canvas id="collectionsChart"></canvas>
                 </div>
               </div>
 

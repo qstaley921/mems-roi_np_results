@@ -60,11 +60,11 @@ body {
   border: 1px solid #d0d0d0;
   border-radius: 8px;
   overflow: hidden;
-  flex: 1;
   display: flex;
   flex-direction: column;
-  height: 500px;
-  max-height: 500px;
+  height: 550px;
+  min-height: 550px;
+  max-height: 550px;
 }
 
 /* Panel Header */
@@ -340,9 +340,23 @@ body {
   overflow-x: auto;
   overflow-y: auto;
   margin: -0.5rem 0 0.5rem 0;
-  max-height: 280px;
+  flex: 1;
   position: relative;
   border-bottom: 1px solid #d0d0d0;
+  min-height: 0;
+}
+
+/* Location column vertical separator extending to full height */
+.data-table-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 140px; /* Width of location column */
+  bottom: 0;
+  width: 1px;
+  background-color: #d0d0d0;
+  z-index: 30;
+  pointer-events: none;
 }
 
 .data-table-container::-webkit-scrollbar {
@@ -409,18 +423,11 @@ body {
   left: 0;
   background-color: #ffffff;
   z-index: 31;
+  width: 140px;
+  min-width: 140px;
+  max-width: 140px;
 }
 
-.data-table thead th:first-child::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 1px;
-  background-color: #d0d0d0;
-  z-index: 32;
-}
 
 .data-table thead th:first-child::after {
   content: '';
@@ -463,18 +470,11 @@ body {
   position: sticky;
   left: 0;
   z-index: 6;
+  width: 140px;
+  min-width: 140px;
+  max-width: 140px;
 }
 
-.data-table tbody td:first-child::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 1px;
-  background-color: #d0d0d0;
-  z-index: 7;
-}
 
 .data-table tbody td:last-child {
   padding-right: 1.5rem;
@@ -530,7 +530,6 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   padding: 0.75rem 1.5rem 1.5rem 1.5rem;
-  margin-top: auto;
 }
 
 .metric-card {
@@ -673,8 +672,8 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  height: 100%;
   overflow: hidden;
+  min-height: 0;
 }
 
 /* Graph Content */
@@ -709,7 +708,7 @@ body {
 .chart-container {
   flex: 1;
   background-color: #ffffff;
-  padding: 0 1.5rem 1.5rem 1.5rem;
+  padding: 0 1.5rem 0 1.5rem;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -719,10 +718,11 @@ body {
 /* Graph Header - Centered in chart area */
 .graph-header {
   text-align: center;
-  padding: 1rem 2rem;
+  padding: 1rem 2rem 0.5rem;
   margin: 0 auto;
   max-width: 800px;
   flex-shrink: 0;
+  position: relative;
 }
 
 .graph-title {
@@ -767,7 +767,7 @@ body {
 }
 
 .graph-subtitle {
-  font-size: 0.875rem;
+  font-size: 1.25rem;
   color: #666;
   margin: 0;
 }
@@ -878,7 +878,88 @@ body {
   border: 3px solid #ffffff;
 }
 
-/* Ticker Tooltip */
+/* Fixed Ticker Display */
+.ticker-display {
+  position: absolute;
+  top: 50px; /* Will be dynamically updated by JavaScript */
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #b8ddc0 0%, #d4edda 100%);
+  border: 1px solid #d0d0d0;
+  border-radius: 8px !important;
+  width: 250px;
+  z-index: 1; /* Behind the graph */
+  overflow: hidden;
+  transition: background 0.2s ease;
+}
+
+.ticker-display.is-projected {
+  background: linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%);
+}
+
+.ticker-display.is-member {
+  background: linear-gradient(135deg, #b8ddc0 0%, #d4edda 100%);
+}
+
+.ticker-display-year-header {
+  background: #ffffff;
+  border-bottom: 1px solid #d0d0d0;
+  color: #2d2d2d;
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.ticker-display-content {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+  text-align: center;
+}
+
+.ticker-display-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ticker-display-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #2d2d2d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ticker-display-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ticker-display-value-member.is-member {
+  color: #4caf50;
+}
+
+.ticker-display-value-member.is-projected {
+  color: #2196f3;
+}
+
+.ticker-display-value-start {
+  color: #666;
+}
+
+.ticker-display-percent {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+/* Old Ticker Tooltip (kept for backwards compatibility, hidden) */
 .ticker-tooltip {
   position: absolute;
   background-color: #2d2d2d;
@@ -889,6 +970,7 @@ body {
   white-space: nowrap;
   pointer-events: none;
   transition: left 0.1s ease-out, top 0.1s ease-out;
+  display: none; /* Hidden */
 }
 
 .ticker-tooltip.position-top {
@@ -1015,8 +1097,9 @@ body {
 /* Responsive Graph View */
 @media (max-width: 991px) {
   .results-panel {
-    height: auto;
-    max-height: none;
+    height: 550px;
+    min-height: 550px;
+    max-height: 550px;
   }
 
   .graph-header {

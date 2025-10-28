@@ -636,8 +636,8 @@ document.addEventListener('DOMContentLoaded', function() {
       updateChart(currentGrowthRate, currentLocation);
 
       // Update ticker display with new growth rate
-      if (updateTickerPositionFn && collectionsChart) {
-        updateTickerPositionFn(currentTickerIndex);
+      if (updateTickerDisplayFn && collectionsChart) {
+        updateTickerDisplayFn(currentTickerIndex);
       }
     });
   }
@@ -650,8 +650,8 @@ document.addEventListener('DOMContentLoaded', function() {
       updateChart(currentGrowthRate, currentLocation);
 
       // Update ticker display with new location data
-      if (updateTickerPositionFn && collectionsChart) {
-        updateTickerPositionFn(currentTickerIndex);
+      if (updateTickerDisplayFn && collectionsChart) {
+        updateTickerDisplayFn(currentTickerIndex);
       }
     });
   }
@@ -668,22 +668,32 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // ============================================
-  // TICKER FUNCTIONALITY
+  // TICKER FUNCTIONALITY (Bar Selection)
   // ============================================
 
-  let isDragging = false;
   let currentTickerIndex = 0;
-  let updateTickerPositionFn = null;
+  let updateTickerDisplayFn = null;
 
   function initializeTicker() {
     if (!collectionsChart) return;
 
-    const ticker = document.getElementById('ticker');
-    const tickerNub = document.getElementById('tickerNub');
-    const tickerTooltip = document.getElementById('tickerTooltip');
+    const tickerDisplay = document.getElementById('tickerDisplay');
     const canvas = collectionsChart.canvas;
+    const graphHeader = document.querySelector('.graph-header');
 
-    if (!ticker || !tickerNub || !canvas) return;
+    if (!tickerDisplay || !canvas || !graphHeader) return;
+
+    // Position ticker display dynamically based on graph header height
+    function positionTickerDisplay() {
+      const headerHeight = graphHeader.offsetHeight;
+      tickerDisplay.style.top = `${headerHeight + 10}px`;
+    }
+
+    // Initial positioning
+    positionTickerDisplay();
+
+    // Reposition on window resize
+    window.addEventListener('resize', positionTickerDisplay);
 
     // Start at current year
     const labels = collectionsChart.data.labels;
@@ -692,115 +702,58 @@ document.addEventListener('DOMContentLoaded', function() {
     currentTickerIndex = labels.indexOf(currentYearLabel);
     if (currentTickerIndex === -1) currentTickerIndex = Math.floor(labels.length / 2);
 
-    // Update ticker position and store the function
-    updateTickerPositionFn = updateTickerPosition;
-    updateTickerPosition(currentTickerIndex);
+    // Update ticker display and store the function
+    updateTickerDisplayFn = updateTickerDisplay;
+    updateTickerDisplay(currentTickerIndex);
 
-    // Drag functionality on nub
-    tickerNub.addEventListener('mousedown', function(e) {
-      e.preventDefault();
-      isDragging = true;
-      tickerNub.style.cursor = 'grabbing';
-    });
-
-    document.addEventListener('mousemove', function(e) {
-      if (!isDragging) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-
-      // Find nearest bar
-      const meta = collectionsChart.getDatasetMeta(0);
-      let nearestIndex = 0;
-      let nearestDistance = Infinity;
-
-      for (let i = 0; i < labels.length; i++) {
-        const barMeta = meta.data[i];
-        if (!barMeta) continue;
-
-        const barX = barMeta.x;
-        const distance = Math.abs(mouseX - barX);
-
-        if (distance < nearestDistance) {
-          nearestDistance = distance;
-          nearestIndex = i;
-        }
-      }
-
-      if (nearestIndex !== currentTickerIndex) {
-        currentTickerIndex = nearestIndex;
-        updateTickerPosition(currentTickerIndex);
-      }
-    });
-
-    document.addEventListener('mouseup', function(e) {
-      if (isDragging) {
-        isDragging = false;
-        tickerNub.style.cursor = 'grab';
-      }
-    });
-
-    // Click on chart to move ticker
+    // Click on chart to select bar
     canvas.addEventListener('click', function(e) {
-      if (isDragging) return; // Ignore if we just finished dragging
+      // Use Chart.js built-in method to get elements at click position
+      const points = collectionsChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
 
-      const rect = canvas.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
+      if (points.length > 0) {
+        // Get the index from the first clicked element
+        const clickedIndex = points[0].index;
 
-      // Find nearest bar
-      const meta = collectionsChart.getDatasetMeta(0);
-      let nearestIndex = 0;
-      let nearestDistance = Infinity;
+        if (clickedIndex !== currentTickerIndex) {
+          currentTickerIndex = clickedIndex;
+          updateTickerDisplay(currentTickerIndex);
+        }
+      } else {
+        // If no bar was clicked, try to find nearest bar by x position
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
 
-      for (let i = 0; i < labels.length; i++) {
-        const barMeta = meta.data[i];
-        if (!barMeta) continue;
+        // Find nearest bar by x position
+        const meta = collectionsChart.getDatasetMeta(0);
+        let nearestIndex = 0;
+        let nearestDistance = Infinity;
 
-        const barX = barMeta.x;
-        const distance = Math.abs(clickX - barX);
+        for (let i = 0; i < meta.data.length; i++) {
+          const barMeta = meta.data[i];
+          if (!barMeta) continue;
 
-        if (distance < nearestDistance) {
-          nearestDistance = distance;
-          nearestIndex = i;
+          const distance = Math.abs(clickX - barMeta.x);
+
+          if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestIndex = i;
+          }
+        }
+
+        // Only update if click is reasonably close to a bar (within 50px)
+        if (nearestDistance < 50 && nearestIndex !== currentTickerIndex) {
+          currentTickerIndex = nearestIndex;
+          updateTickerDisplay(currentTickerIndex);
         }
       }
-
-      currentTickerIndex = nearestIndex;
-      updateTickerPosition(currentTickerIndex);
     });
 
-    function updateTickerPosition(index) {
+    function updateTickerDisplay(index) {
       // Get the actual visible bar (Member Average or Projected Average)
       // Dataset 1 = Member Average (green), Dataset 2 = Projected Average (blue)
       const memberValue = collectionsChart.data.datasets[1].data[index];
       const projectedValue = collectionsChart.data.datasets[2].data[index];
-
-      let targetBarMeta = null;
-
-      // Use member bar if it exists (past data), otherwise use projected bar (future data)
-      if (memberValue !== null) {
-        targetBarMeta = collectionsChart.getDatasetMeta(1).data[index];
-      } else if (projectedValue !== null) {
-        targetBarMeta = collectionsChart.getDatasetMeta(2).data[index];
-      }
-
-      if (!targetBarMeta) return;
-
-      const barX = targetBarMeta.x; // Horizontal center of the bar in pixels
-      const barY = targetBarMeta.y; // Top of the bar in pixels from canvas top
-      const barBase = targetBarMeta.base; // Bottom of the bar in pixels from canvas top
-      const barHeight = barBase - barY; // Actual bar height in pixels
-      const chartArea = collectionsChart.chartArea;
-
-      // Add manual offset before constraining
-      const adjustedBarX = barX + 10;
-
-      // Constrain X position to stay within chart boundaries (10px padding from edges)
-      const constrainedX = Math.max(chartArea.left + 10, Math.min(adjustedBarX, chartArea.right - 10));
-
-      // Position nub based on bar dimensions
-      tickerNub.style.left = `${constrainedX}px`;
-      tickerNub.style.top = `${barY}px`; // Exact top of bar
 
       // Get values for this index
       const startValue = collectionsChart.data.datasets[0].data[index];
@@ -810,59 +763,88 @@ document.addEventListener('DOMContentLoaded', function() {
       const bottomValue = startValue;
       const isProjected = projectedValue !== null;
 
-      // Update tooltip values
-      const topValueElement = document.getElementById('tickerTopValue');
-      const bottomValueElement = document.getElementById('tickerBottomValue');
+      // Get the year label for this index
+      const yearLabel = collectionsChart.data.labels[index];
+      const fullYear = '20' + yearLabel.replace("'", ""); // Convert '24 to 2024
 
-      topValueElement.textContent = topValue ? `$${Math.round(topValue).toLocaleString()}` : '$0';
-      bottomValueElement.textContent = bottomValue ? `$${Math.round(bottomValue).toLocaleString()}` : '$0';
+      // Update fixed ticker display
+      const tickerDisplayElement = document.getElementById('tickerDisplay');
+      const tickerDisplayYear = document.getElementById('tickerDisplayYear');
+      const tickerDisplayMemberValue = document.getElementById('tickerDisplayMemberValue');
+      const tickerDisplayStartValue = document.getElementById('tickerDisplayStartValue');
 
-      // Update top value color based on whether it's projected (blue) or member (green)
-      topValueElement.style.color = isProjected ? '#90caf9' : '#4caf50';
-
-      // Position tooltip above the bar
-      // Estimate tooltip width (actual width is ~140-160px)
-      const tooltipWidth = 160;
-      const tooltipHeight = 70;
-      const edgePadding = 20; // Minimum distance from chart edges
-      const rightEdgeThreshold = 80; // Distance from right edge to switch to side positioning
-
-      // Calculate boundaries
-      const leftBoundary = chartArea.left + edgePadding;
-      const rightBoundary = chartArea.right - edgePadding;
-
-      // Calculate where the centered tooltip would be
-      const centeredLeft = barX - tooltipWidth / 2;
-      const centeredRight = barX + tooltipWidth / 2;
-
-      // Determine positioning class based on overflow
-      tickerTooltip.classList.remove('position-top', 'position-top-left', 'position-top-right', 'position-right');
-
-      // Check if we're very close to the right edge
-      if (constrainedX > chartArea.right - rightEdgeThreshold) {
-        // Very close to right edge - position tooltip to the left of nub with right-pointing caret
-        tickerTooltip.classList.add('position-right');
-        tickerTooltip.style.left = `${constrainedX}px`;
-        tickerTooltip.style.top = `${barY}px`;
-      } else if (centeredLeft < leftBoundary) {
-        // Too close to left edge - align tooltip to left of nub
-        tickerTooltip.classList.add('position-top-left');
-        tickerTooltip.style.left = `${constrainedX}px`;
-        tickerTooltip.style.top = `${barY - tooltipHeight}px`;
-      } else if (centeredRight > rightBoundary) {
-        // Close to right edge - align tooltip to right of nub
-        tickerTooltip.classList.add('position-top-right');
-        tickerTooltip.style.left = `${constrainedX}px`;
-        tickerTooltip.style.top = `${barY - tooltipHeight}px`;
-      } else {
-        // Normal centered position
-        tickerTooltip.classList.add('position-top');
-        tickerTooltip.style.left = `${constrainedX}px`;
-        tickerTooltip.style.top = `${barY - tooltipHeight}px`;
+      // Update ticker display background based on projected vs member
+      if (tickerDisplayElement) {
+        if (isProjected) {
+          tickerDisplayElement.classList.add('is-projected');
+          tickerDisplayElement.classList.remove('is-member');
+        } else {
+          tickerDisplayElement.classList.add('is-member');
+          tickerDisplayElement.classList.remove('is-projected');
+        }
       }
+
+      if (tickerDisplayYear) {
+        tickerDisplayYear.textContent = fullYear;
+      }
+
+      if (tickerDisplayMemberValue) {
+        const displayValue = topValue ? `$${Math.round(topValue).toLocaleString()}` : '$0';
+
+        // Update the member value - change label based on projected or member
+        const memberSection = tickerDisplayMemberValue.closest('.ticker-display-section');
+        const memberLabel = memberSection.querySelector('.ticker-display-label');
+
+        if (isProjected) {
+          memberLabel.textContent = 'Projected average';
+          tickerDisplayMemberValue.classList.add('is-projected');
+          tickerDisplayMemberValue.classList.remove('is-member');
+        } else {
+          memberLabel.textContent = 'Member average';
+          tickerDisplayMemberValue.classList.add('is-member');
+          tickerDisplayMemberValue.classList.remove('is-projected');
+        }
+
+        tickerDisplayMemberValue.textContent = displayValue;
+      }
+
+      if (tickerDisplayStartValue) {
+        tickerDisplayStartValue.textContent = `$${Math.round(bottomValue).toLocaleString()}`;
+      }
+
+      // Update bar opacity - selected bars at 100%, others at 50%
+      for (let datasetIndex = 0; datasetIndex < collectionsChart.data.datasets.length; datasetIndex++) {
+        const dataset = collectionsChart.data.datasets[datasetIndex];
+        const originalColor = datasetIndex === 0 ? '#9e9e9e' : datasetIndex === 1 ? '#4caf50' : '#90caf9';
+
+        // Create array of colors for each bar
+        dataset.backgroundColor = [];
+        for (let i = 0; i < collectionsChart.data.labels.length; i++) {
+          if (i === index) {
+            // Selected bar - full opacity
+            dataset.backgroundColor.push(originalColor);
+          } else {
+            // Unselected bars - 50% opacity
+            const rgb = hexToRgb(originalColor);
+            dataset.backgroundColor.push(`rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`);
+          }
+        }
+      }
+
+      collectionsChart.update('none'); // Update without animation
     }
 
-    // Return updateTickerPosition so it can be called from location change
-    return updateTickerPosition;
+    // Helper function to convert hex to RGB
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : { r: 0, g: 0, b: 0 };
+    }
+
+    // Return updateTickerDisplay so it can be called from location change
+    return updateTickerDisplay;
   }
 });
