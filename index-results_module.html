@@ -153,7 +153,7 @@
                   <div class="graph-header">
                     <h2 class="graph-title">
                       What if I grew my new patients by
-                      <input type="number" id="growthInput" class="growth-input" value="10" min="0" max="100" step="1" />%
+                      <input type="number" id="growthInput" class="growth-input" value="10" min="0" max="100" step="1" oninput="this.value = this.value < 0 ? 0 : this.value" />%
                       each year?
                     </h2>
                     <p class="graph-subtitle">Your current average new patient growth is <span id="currentGrowthRate">10%</span></p>
@@ -161,23 +161,15 @@
 
                   <canvas id="collectionsChart"></canvas>
 
-                  <!-- Draggable Ticker (hidden for now, will build after graph) -->
-                  <div class="ticker" id="ticker" style="display: none;">
-                    <div class="ticker-line"></div>
-                    <div class="ticker-handle">
-                      <i class="fas fa-circle"></i>
+                  <!-- Draggable Ticker -->
+                  <div class="ticker" id="ticker">
+                    <div class="ticker-highlight"></div>
+                    <div class="ticker-tooltip position-top" id="tickerTooltip">
+                      <div class="tooltip-value" id="tickerTopValue">$###,###,###</div>
+                      <div class="tooltip-value" id="tickerBottomValue">$###,###,###</div>
                     </div>
-                    <div class="ticker-tooltip">
-                      <div class="tooltip-title">Cumulative collections</div>
-                      <div class="tooltip-item member-avg">
-                        <span class="tooltip-value" id="tickerMemberValue">$3,245,809</span>
-                        <span class="tooltip-label">Member Avg. Numbers</span>
-                        <span class="tooltip-percent" id="tickerMemberPercent">(+16%)</span>
-                      </div>
-                      <div class="tooltip-item starting-avg">
-                        <span class="tooltip-value" id="tickerStartValue">$2,789,876</span>
-                        <span class="tooltip-label">Starting Avg. Numbers</span>
-                      </div>
+                    <div class="ticker-nub" id="tickerNub">
+                      <div class="nub-circle"></div>
                     </div>
                   </div>
                 </div>
@@ -195,8 +187,8 @@
                     <span class="legend-label">Member Avg. <span class="legend-percent legend-percent-green" id="legendMemberPercent">(+10%)</span></span>
                   </div>
                   <div class="legend-item">
-                    <span class="legend-color" style="background-color: #81c784;"></span>
-                    <span class="legend-label">Projected Avg. <span class="legend-percent legend-percent-green" id="legendProjectedPercent">(+10%)</span></span>
+                    <span class="legend-color" style="background-color: #90caf9;"></span>
+                    <span class="legend-label">Projected Avg. <span class="legend-percent legend-percent-blue" id="legendProjectedPercent">(+10%)</span></span>
                   </div>
                 </div>
               </div>

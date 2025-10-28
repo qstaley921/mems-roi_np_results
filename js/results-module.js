@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // ============================================
 
   let collectionsChart = null;
-  let currentGrowthRate = 10; // Default growth rate percentage
+  let currentGrowthRate = null; // Will be set to actual member growth rate
   let currentLocation = 'all'; // Default to all locations
 
   // Helper function to convert kebab-case location value to proper case name
@@ -373,11 +373,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let cumulativeStartCollections = 0;
     let cumulativeMemberCollections = 0;
     let cumulativeProjectedCollections = 0;
+    let lastMemberValue = 0;
 
     for (let i = 0; i <= periodCount; i++) {
       const periodStartMonth = i * periodLength;
       const periodDate = addMonths(startDate, periodStartMonth);
-      const isPast = periodDate <= today;
+
+      // Check if this year is in the past (current year and onwards is considered future)
+      const periodYear = periodDate.getFullYear();
+      const currentYear = today.getFullYear();
+      const isPast = periodYear < currentYear;
 
       // Generate abbreviated year label (e.g., '22, '23, '24)
       const year = periodDate.getFullYear();
@@ -401,18 +406,20 @@ document.addEventListener('DOMContentLoaded', function() {
         cumulativeMemberCollections += memberPeriodCollections;
         memberAvgData.push(cumulativeMemberCollections);
         projectedAvgData.push(null); // No projection for past data
+        lastMemberValue = cumulativeMemberCollections; // Track last member value
       } else {
         // Future data: use compound growth from current member average
+        // Initialize projected from last member value on first future period
+        if (cumulativeProjectedCollections === 0) {
+          cumulativeProjectedCollections = lastMemberValue;
+        }
+
         const yearsFromNow = (periodStartMonth - monthsToPresent) / 12;
         const currentNewPatients = location.newAvg;
         const growthMultiplier = Math.pow(1 + (growthRate / 100), yearsFromNow);
         const projectedNewPatients = currentNewPatients * growthMultiplier;
         const projectedPeriodCollections = projectedNewPatients * periodLength * location.avgRevenue;
 
-        // For projected, start from where member left off
-        if (cumulativeProjectedCollections === 0) {
-          cumulativeProjectedCollections = cumulativeMemberCollections;
-        }
         cumulativeProjectedCollections += projectedPeriodCollections;
 
         memberAvgData.push(null); // No member data for future
@@ -476,6 +483,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('collectionsChart');
     if (!ctx) return;
 
+    // Get initial data to determine actual growth rate
+    const initialData = getGraphDataForSelection(currentLocation, 10); // Use temporary value
+    const actualGrowthRate = Math.round(initialData.actualGrowthRate);
+
+    // Set current growth rate to actual member growth rate
+    if (currentGrowthRate === null) {
+      currentGrowthRate = actualGrowthRate;
+
+      // Update the input field
+      const growthInput = document.getElementById('growthInput');
+      if (growthInput) {
+        growthInput.value = currentGrowthRate;
+      }
+    }
+
     const graphData = getGraphDataForSelection(currentLocation, currentGrowthRate);
 
     collectionsChart = new Chart(ctx, {
@@ -489,7 +511,8 @@ document.addEventListener('DOMContentLoaded', function() {
             backgroundColor: '#9e9e9e',
             borderRadius: 0,
             barPercentage: 1.0,
-            categoryPercentage: 1.0
+            categoryPercentage: 1.0,
+            stack: 'stack0'
           },
           {
             label: 'Member Average',
@@ -497,15 +520,17 @@ document.addEventListener('DOMContentLoaded', function() {
             backgroundColor: '#4caf50',
             borderRadius: 0,
             barPercentage: 1.0,
-            categoryPercentage: 1.0
+            categoryPercentage: 1.0,
+            stack: 'stack1'
           },
           {
             label: 'Projected Average',
             data: graphData.projectedAvgData,
-            backgroundColor: '#81c784',
+            backgroundColor: '#90caf9',
             borderRadius: 0,
             barPercentage: 1.0,
-            categoryPercentage: 1.0
+            categoryPercentage: 1.0,
+            stack: 'stack1'
           }
         ]
       },
@@ -521,29 +546,12 @@ document.addEventListener('DOMContentLoaded', function() {
             display: false
           },
           tooltip: {
-            backgroundColor: '#2d2d2d',
-            titleColor: '#ffffff',
-            bodyColor: '#ffffff',
-            borderColor: '#4caf50',
-            borderWidth: 1,
-            padding: 12,
-            displayColors: true,
-            callbacks: {
-              label: function(context) {
-                let label = context.dataset.label || '';
-                if (label) {
-                  label += ': ';
-                }
-                if (context.parsed.y !== null) {
-                  label += '$' + context.parsed.y.toLocaleString();
-                }
-                return label;
-              }
-            }
+            enabled: false
           }
         },
         scales: {
           x: {
+            stacked: false,
             grid: {
               display: false
             },
@@ -560,6 +568,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           },
           y: {
+            stacked: false,
             display: false,
             grid: {
               display: false
@@ -603,8 +612,27 @@ document.addEventListener('DOMContentLoaded', function() {
   const growthInput = document.getElementById('growthInput');
   if (growthInput) {
     growthInput.addEventListener('input', function() {
-      const value = parseFloat(this.value) || 0;
-      currentGrowthRate = Math.max(0, Math.min(100, value)); // Clamp between 0-100
+      let value = parseFloat(this.value);
+
+      // Prevent negative numbers
+      if (value < 0) {
+        value = 0;
+        this.value = 0;
+      }
+
+      currentGrowthRate = Math.max(0, Math.min(100, value || 0)); // Clamp between 0-100
+
+      // Get current data to check actual growth rate
+      const graphData = getGraphDataForSelection(currentLocation, currentGrowthRate);
+      const actualGrowthRate = Math.round(graphData.actualGrowthRate);
+
+      // Change input color to blue if different from member average
+      if (currentGrowthRate !== actualGrowthRate) {
+        this.classList.add('input-modified');
+      } else {
+        this.classList.remove('input-modified');
+      }
+
       updateChart(currentGrowthRate, currentLocation);
     });
   }
@@ -625,7 +653,179 @@ document.addEventListener('DOMContentLoaded', function() {
       if (currentView === 'graph' && !collectionsChart) {
         initializeChart();
         updateChart(currentGrowthRate);
+        initializeTicker();
       }
     }, 300);
   });
+
+  // ============================================
+  // TICKER FUNCTIONALITY
+  // ============================================
+
+  let isDragging = false;
+  let currentTickerIndex = 0;
+
+  function initializeTicker() {
+    if (!collectionsChart) return;
+
+    const ticker = document.getElementById('ticker');
+    const tickerNub = document.getElementById('tickerNub');
+    const tickerHighlight = ticker.querySelector('.ticker-highlight');
+    const tickerTooltip = document.getElementById('tickerTooltip');
+    const canvas = collectionsChart.canvas;
+
+    if (!ticker || !tickerNub || !canvas) return;
+
+    // Start at current year
+    const labels = collectionsChart.data.labels;
+    const currentYear = new Date().getFullYear();
+    const currentYearLabel = `'${currentYear.toString().slice(-2)}`;
+    currentTickerIndex = labels.indexOf(currentYearLabel);
+    if (currentTickerIndex === -1) currentTickerIndex = Math.floor(labels.length / 2);
+
+    // Update ticker position
+    updateTickerPosition(currentTickerIndex);
+
+    // Drag functionality on nub
+    let dragStartX = 0;
+
+    tickerNub.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      isDragging = true;
+      dragStartX = e.clientX;
+      tickerNub.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', function(e) {
+      if (!isDragging) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+
+      // Find nearest bar
+      const meta = collectionsChart.getDatasetMeta(0);
+      let nearestIndex = 0;
+      let nearestDistance = Infinity;
+
+      for (let i = 0; i < labels.length; i++) {
+        const barMeta = meta.data[i];
+        if (!barMeta) continue;
+
+        const barX = barMeta.x;
+        const distance = Math.abs(mouseX - barX);
+
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestIndex = i;
+        }
+      }
+
+      if (nearestIndex !== currentTickerIndex) {
+        currentTickerIndex = nearestIndex;
+        updateTickerPosition(currentTickerIndex);
+      }
+    });
+
+    document.addEventListener('mouseup', function(e) {
+      if (isDragging) {
+        isDragging = false;
+        tickerNub.style.cursor = 'grab';
+      }
+    });
+
+    // Click on chart to move ticker
+    canvas.addEventListener('click', function(e) {
+      if (isDragging) return; // Ignore if we just finished dragging
+
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+
+      // Find nearest bar
+      const meta = collectionsChart.getDatasetMeta(0);
+      let nearestIndex = 0;
+      let nearestDistance = Infinity;
+
+      for (let i = 0; i < labels.length; i++) {
+        const barMeta = meta.data[i];
+        if (!barMeta) continue;
+
+        const barX = barMeta.x;
+        const distance = Math.abs(clickX - barX);
+
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestIndex = i;
+        }
+      }
+
+      currentTickerIndex = nearestIndex;
+      updateTickerPosition(currentTickerIndex);
+    });
+
+    function updateTickerPosition(index) {
+      const labels = collectionsChart.data.labels;
+
+      // Get the highest bar at this index (could be from any dataset)
+      let highestBarMeta = null;
+      let highestValue = 0;
+
+      for (let datasetIndex = 0; datasetIndex < collectionsChart.data.datasets.length; datasetIndex++) {
+        const meta = collectionsChart.getDatasetMeta(datasetIndex);
+        const value = collectionsChart.data.datasets[datasetIndex].data[index];
+
+        if (value !== null && value > highestValue) {
+          highestValue = value;
+          highestBarMeta = meta.data[index];
+        }
+      }
+
+      if (!highestBarMeta) return;
+
+      const barX = highestBarMeta.x;
+      const barY = highestBarMeta.y;
+      const chartArea = collectionsChart.chartArea;
+      const barWidth = highestBarMeta.width || 40;
+
+      // Calculate bar height (from bar top to chart bottom)
+      const barHeight = chartArea.bottom - barY;
+
+      // Position highlight centered on bar, with height matching the bar
+      tickerHighlight.style.left = `${barX - barWidth / 2}px`;
+      tickerHighlight.style.width = `${barWidth}px`;
+      tickerHighlight.style.height = `${barHeight}px`;
+
+      // Position nub at the top of the bar
+      tickerNub.style.left = `${barX}px`;
+      tickerNub.style.top = `${barY}px`;
+
+      // Get values for this index
+      const startValue = collectionsChart.data.datasets[0].data[index];
+      const memberValue = collectionsChart.data.datasets[1].data[index];
+      const projectedValue = collectionsChart.data.datasets[2].data[index];
+
+      // Determine which value to show (member or projected)
+      const topValue = projectedValue !== null ? projectedValue : memberValue;
+      const bottomValue = startValue;
+
+      // Update tooltip values
+      document.getElementById('tickerTopValue').textContent = topValue ? `$${Math.round(topValue).toLocaleString()}` : '$0';
+      document.getElementById('tickerBottomValue').textContent = bottomValue ? `$${Math.round(bottomValue).toLocaleString()}` : '$0';
+
+      // Position tooltip above the bar
+      const threshold = chartArea.right - 100; // Right edge threshold
+
+      tickerTooltip.style.left = `${barX}px`;
+
+      // Switch between top and left positioning based on horizontal space
+      if (barX > threshold) {
+        tickerTooltip.classList.remove('position-top');
+        tickerTooltip.classList.add('position-left');
+        tickerTooltip.style.top = `${barY}px`;
+      } else {
+        tickerTooltip.classList.remove('position-left');
+        tickerTooltip.classList.add('position-top');
+        tickerTooltip.style.top = `${barY - 60}px`; // Position above the bar
+      }
+    }
+  }
 });
