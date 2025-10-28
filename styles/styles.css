@@ -814,6 +814,10 @@ body {
   display: inline-block;
 }
 
+.graph-legend-footer .legend-color-square {
+  border-radius: 0;
+}
+
 .graph-legend-footer .legend-label {
   font-weight: 500;
 }
