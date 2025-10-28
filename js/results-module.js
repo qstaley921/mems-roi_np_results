@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update footnote text for graph
         if (footnoteText) {
-          footnoteText.textContent = '*This graph shows average numbers and will not match your actual collections exactly.';
+          footnoteText.textContent = '*This graph shows average numbers and may not match your exact collections.';
         }
 
         console.log('Switched to graph view');
@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update footnote text for table
         if (footnoteText) {
-          footnoteText.textContent = '*This table shows average numbers and will not match your actual collections exactly.';
+          footnoteText.textContent = '*This table shows average numbers and may not match your exact collections.';
         }
 
         console.log('Switched to table view');
@@ -528,7 +528,8 @@ function updateSubtitle(currentAvg, adjustedAvg, yearsElapsed = 1) {
   if (percentChangeSpan) {
     const percentChange = ((adjustedAvg - currentAvg) / currentAvg) * 100;
     const isDecrease = percentChange < 0;
-    const isNoChange = adjustedAvg === currentAvg;
+    // Check both exact equality AND rounded equality
+    const isNoChange = adjustedAvg === currentAvg || Math.round(adjustedAvg) === Math.round(currentAvg);
     const absPercent = Math.abs(Math.round(percentChange));
 
     percentChangeSpan.textContent = `${absPercent}%`;
@@ -553,7 +554,7 @@ function updateSubtitle(currentAvg, adjustedAvg, yearsElapsed = 1) {
     let changeColor, changeText, collectionText;
     if (isNoChange) {
       changeColor = '#9e9e9e';
-      changeText = 'no change';
+      changeText = 'change';
       collectionText = '';
     } else if (isDecrease) {
       changeColor = '#f44336';
@@ -567,10 +568,14 @@ function updateSubtitle(currentAvg, adjustedAvg, yearsElapsed = 1) {
 
     percentChangeSpan.style.color = changeColor;
 
+    // Determine article (a vs an) based on percentage
+    const percentStr = absPercent.toString();
+    const article = (percentStr.startsWith('8') || percentStr.startsWith('18')) ? 'an' : 'a';
+
     // Update subtitle
     const subtitleText = document.querySelector('.graph-subtitle');
     if (subtitleText) {
-      subtitleText.innerHTML = `<span id="currentAverage">${Math.round(currentAvg)}</span> is the current average. <span id="adjustedAverage">${Math.round(adjustedAvg)}</span> is a <span id="percentChange" style="color: ${changeColor}">${absPercent}%</span> ${changeText}${collectionText}.`;
+      subtitleText.innerHTML = `<span id="currentAverage">${Math.round(currentAvg)}</span> is the current average. <span id="adjustedAverage">${Math.round(adjustedAvg)}</span> is ${article} <span id="percentChange" style="color: ${changeColor}">${absPercent}%</span> ${changeText}${collectionText}.`;
     }
   }
 }

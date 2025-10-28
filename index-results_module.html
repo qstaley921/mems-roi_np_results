@@ -139,8 +139,7 @@
                     <h2 class="graph-title">
                       What if we had
                       <span class="growth-input-wrapper"><input type="number" id="growthInput" class="growth-input" value="54" min="0" step="1" oninput="this.value = this.value < 0 ? 0 : this.value" /></span>
-                      monthly new patients?
-                      <button class="reset-btn" id="resetBtn"><i class="fas fa-undo"></i></button>
+                      monthly new patients?<span class="reset-btn-wrapper"><button class="reset-btn" id="resetBtn"><i class="fas fa-undo"></i></button></span>
                     </h2>
                     <p class="graph-subtitle"><span id="currentAverage">49</span> is the current average. <span id="adjustedAverage">54</span> is a <span id="percentChange">10%</span> increase.</p>
                   </div>
@@ -218,7 +217,7 @@
 
           <!-- Panel Footnote (shows different text based on view) -->
           <div class="panel-footnote" id="panelFootnote">
-            <p id="footnoteText">*This table shows average numbers and will not match your actual collections exactly.</p>
+            <p id="footnoteText">*This table shows average numbers and may not match your exact collections.</p>
           </div>
         </div>
 
