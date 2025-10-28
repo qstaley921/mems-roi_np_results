@@ -320,19 +320,43 @@ let defaultAdjustedAverage = 49; // Default +10% value (will be set from current
 // Get current average from selected location
 function getCurrentAverageFromLocation() {
   const locationSelect = document.getElementById('locationSelect');
-  const selectedValue = locationSelect ? locationSelect.value : 'north-point';
+  const selectedValue = locationSelect ? locationSelect.value : 'all';
 
   // If "all locations" selected, sum all location averages
   if (selectedValue === 'all') {
     return npData.locations.reduce((sum, loc) => sum + loc.newAvg, 0);
   }
 
-  // Find the specific location
-  const location = npData.locations.find(loc =>
-    loc.name.toLowerCase().replace(/\s+/g, '-') === selectedValue
-  );
+  // Extract location index from value (e.g., "location-0" -> 0)
+  const match = selectedValue.match(/^location-(\d+)$/);
+  if (match) {
+    const index = parseInt(match[1], 10);
+    return npData.locations[index] ? npData.locations[index].newAvg : 0;
+  }
 
-  return location ? location.newAvg : 49;
+  return npData.locations.length > 0 ? npData.locations[0].newAvg : 0;
+}
+
+// Get average revenue from selected location
+function getAverageRevenueFromLocation() {
+  const locationSelect = document.getElementById('locationSelect');
+  const selectedValue = locationSelect ? locationSelect.value : 'all';
+
+  // If "all locations" selected, calculate weighted average
+  if (selectedValue === 'all') {
+    const totalRevenue = npData.locations.reduce((sum, loc) => sum + (loc.avgRevenue * loc.newAvg), 0);
+    const totalPatients = npData.locations.reduce((sum, loc) => sum + loc.newAvg, 0);
+    return totalPatients > 0 ? totalRevenue / totalPatients : 0;
+  }
+
+  // Extract location index from value (e.g., "location-0" -> 0)
+  const match = selectedValue.match(/^location-(\d+)$/);
+  if (match) {
+    const index = parseInt(match[1], 10);
+    return npData.locations[index] ? npData.locations[index].avgRevenue : 0;
+  }
+
+  return npData.locations.length > 0 ? npData.locations[0].avgRevenue : 0;
 }
 
 // Calculate simple graph data (cumulative)
@@ -347,6 +371,9 @@ function calculateSimpleGraphData(adjustedAvg) {
   // Get current average from location
   const currentAvg = currentMonthlyAverage;
 
+  // Get average revenue from location
+  const avgRevenue = getAverageRevenueFromLocation();
+
   // Cumulative totals
   let cumulativeCurrent = 0;
   let cumulativeAdjusted = 0;
@@ -356,8 +383,8 @@ function calculateSimpleGraphData(adjustedAvg) {
     labels.push(year.toString());
 
     // Annual collections: monthly average × 12 months × revenue
-    const currentAnnualCollections = currentAvg * 12 * npData.locations[0].avgRevenue;
-    const adjustedAnnualCollections = adjustedAvg * 12 * npData.locations[0].avgRevenue;
+    const currentAnnualCollections = currentAvg * 12 * avgRevenue;
+    const adjustedAnnualCollections = adjustedAvg * 12 * avgRevenue;
 
     // Add to cumulative totals
     cumulativeCurrent += currentAnnualCollections;
@@ -814,6 +841,29 @@ function initializeDataSelector() {
   });
 }
 
+// Update location selector with current doctor's locations
+function updateLocationSelector() {
+  const locationSelect = document.getElementById('locationSelect');
+  if (!locationSelect) return;
+
+  // Clear existing options
+  locationSelect.innerHTML = '';
+
+  // Add "All locations" option
+  const allOption = document.createElement('option');
+  allOption.value = 'all';
+  allOption.textContent = 'All locations';
+  locationSelect.appendChild(allOption);
+
+  // Add option for each location
+  npData.locations.forEach((location, index) => {
+    const option = document.createElement('option');
+    option.value = `location-${index}`;
+    option.textContent = location.name;
+    locationSelect.appendChild(option);
+  });
+}
+
 // Load data for selected doctor
 function loadDoctorData(doctorName) {
   if (typeof sampleDataSets === 'undefined' || !sampleDataSets[doctorName]) {
@@ -824,6 +874,9 @@ function loadDoctorData(doctorName) {
   // Update npData with selected doctor's data
   npData.locations = sampleDataSets[doctorName].locations;
   npData.investment = sampleDataSets[doctorName].investment;
+
+  // Update location selector dropdown
+  updateLocationSelector();
 
   // Recalculate and update the display
   updateTable(currentPeriod);
