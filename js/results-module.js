@@ -809,8 +809,10 @@ document.addEventListener('DOMContentLoaded', function() {
       tickerDisplay.style.top = `${headerHeight + 10}px`;
     }
 
-    // Initial positioning
-    positionTickerDisplay();
+    // Initial positioning with delay to allow header to render
+    setTimeout(() => {
+      positionTickerDisplay();
+    }, 100);
 
     // Reposition on window resize
     window.addEventListener('resize', positionTickerDisplay);

@@ -735,6 +735,10 @@ body {
   flex-wrap: wrap;
 }
 
+.growth-input-wrapper {
+  white-space: nowrap;
+}
+
 .growth-input {
   width: 60px;
   padding: 0.25rem 0.5rem;
@@ -745,6 +749,10 @@ body {
   border-radius: 4px;
   text-align: center;
   background-color: #f0f9f1;
+}
+
+.growth-percent {
+  padding-left: 2px;
 }
 
 .growth-input:focus {
@@ -776,6 +784,8 @@ body {
   height: 100% !important;
   flex: 1;
   min-height: 0;
+  position: relative;
+  z-index: 10;
 }
 
 /* Graph Legend Footer */

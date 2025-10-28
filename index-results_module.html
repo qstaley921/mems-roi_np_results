@@ -137,7 +137,7 @@
                   <div class="graph-header">
                     <h2 class="graph-title">
                       What if I grew my new patients by
-                      <input type="number" id="growthInput" class="growth-input" value="10" min="0" max="100" step="1" oninput="this.value = this.value < 0 ? 0 : this.value" />%
+                      <span class="growth-input-wrapper"><input type="number" id="growthInput" class="growth-input" value="10" min="0" max="100" step="1" oninput="this.value = this.value < 0 ? 0 : this.value" /><span class="growth-percent">%</span></span>
                       each year?
                     </h2>
                     <p class="graph-subtitle">Your current average new patient growth is <span id="currentGrowthRate">10%</span></p>
