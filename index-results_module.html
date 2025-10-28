@@ -136,27 +136,28 @@
                   <!-- Graph Header with Growth Input -->
                   <div class="graph-header">
                     <h2 class="graph-title">
-                      What if I grew my new patients by
-                      <span class="growth-input-wrapper"><input type="number" id="growthInput" class="growth-input" value="10" min="0" max="100" step="1" oninput="this.value = this.value < 0 ? 0 : this.value" /><span class="growth-percent">%</span></span>
-                      each year?
+                      What if we had
+                      <span class="growth-input-wrapper"><input type="number" id="growthInput" class="growth-input" value="49" min="0" step="1" oninput="this.value = this.value < 0 ? 0 : this.value" /></span>
+                      monthly new patients?
+                      <button class="reset-btn" id="resetBtn">Reset</button>
                     </h2>
-                    <p class="graph-subtitle">Your current average new patient growth is <span id="currentGrowthRate">10%</span></p>
+                    <p class="graph-subtitle"><span id="currentAverage">49</span> is the current average. <span id="adjustedAverage">51</span> is a <span id="percentChange">4%</span> increase.</p>
                   </div>
 
                   <!-- Fixed Ticker Display (Absolutely Positioned) -->
                   <div class="ticker-display" id="tickerDisplay">
-                    <div class="ticker-display-year-header" id="tickerDisplayYear">2024</div>
+                    <div class="ticker-display-year-header" id="tickerDisplayYear">2025</div>
                     <div class="ticker-display-content">
                       <div class="ticker-display-section">
-                        <div class="ticker-display-label">Member average</div>
-                        <div class="ticker-display-value ticker-display-value-member" id="tickerDisplayMemberValue">
-                          $3,133,961 <span class="ticker-display-percent" id="tickerDisplayMemberPercent">(+14%)</span>
+                        <div class="ticker-display-label">Adjusted collections</div>
+                        <div class="ticker-display-value ticker-display-value-adjusted" id="tickerDisplayAdjustedValue">
+                          $26,914,764
                         </div>
                       </div>
                       <div class="ticker-display-section">
-                        <div class="ticker-display-label">Starting average</div>
-                        <div class="ticker-display-value ticker-display-value-start" id="tickerDisplayStartValue">
-                          $2,679,360 <span class="ticker-display-percent">(+0%)</span>
+                        <div class="ticker-display-label">Current collections</div>
+                        <div class="ticker-display-value ticker-display-value-current" id="tickerDisplayCurrentValue">
+                          $25,058,109
                         </div>
                       </div>
                     </div>
@@ -170,20 +171,12 @@
               <div class="graph-legend-footer">
                 <div class="legend-items">
                   <div class="legend-item">
-                    <span class="legend-color legend-color-square" style="background-color: #000000;"></span>
-                    <span class="legend-label">Start: <span id="legendStartYear">2021</span></span>
+                    <span class="legend-color legend-color-square" style="background-color: #9e9e9e;"></span>
+                    <span class="legend-label">Current avg.</span>
                   </div>
                   <div class="legend-item">
-                    <span class="legend-color" style="background-color: #9e9e9e;"></span>
-                    <span class="legend-label">Start Avg. <span class="legend-percent">(+0%)</span></span>
-                  </div>
-                  <div class="legend-item">
-                    <span class="legend-color" style="background-color: #4caf50;"></span>
-                    <span class="legend-label">Member Avg. <span class="legend-percent legend-percent-green" id="legendMemberPercent">(+10%)</span></span>
-                  </div>
-                  <div class="legend-item">
-                    <span class="legend-color" style="background-color: #90caf9;"></span>
-                    <span class="legend-label">Projected Avg. <span class="legend-percent legend-percent-blue" id="legendProjectedPercent">(+10%)</span></span>
+                    <span class="legend-color legend-color-square" style="background-color: #4caf50;" id="legendAdjustedColor"></span>
+                    <span class="legend-label" id="legendAdjustedLabel">Adjusted avg.</span>
                   </div>
                 </div>
               </div>
