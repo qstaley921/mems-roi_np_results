@@ -2,7 +2,7 @@
 // Handles table data, calculations, and UI interactions
 
 // New Patient Results Data (Monthly base values)
-const npData = {
+let npData = {
   locations: [
     {
       name: "Bradley Place",
@@ -131,25 +131,25 @@ function updateTable(period, customYears = 2) {
 
   tbody.innerHTML = metrics.locations.map(location => `
     <tr>
-      <td class="col-location location-name">${location.name}</td>
-      <td class="col-start-avg">
+      <td class="npi-roi-mod-col-location npi-roi-mod-location-name">${location.name}</td>
+      <td class="npi-roi-mod-col-start-avg">
         ${location.startAvg.toLocaleString()}
-        <span class="math-operator">△</span>
+        <span class="npi-roi-mod-math-operator">△</span>
       </td>
-      <td class="col-new-avg">
+      <td class="npi-roi-mod-col-new-avg">
         ${location.newAvg.toLocaleString()}
-        <span class="math-operator">=</span>
+        <span class="npi-roi-mod-math-operator">=</span>
       </td>
-      <td class="col-growth">
+      <td class="npi-roi-mod-col-growth">
         ${location.growth.toLocaleString()}
-        ${location.growthPercent > 0 ? `<span class="growth-percent">(${location.growthPercent}%)</span>` : ''}
-        <span class="math-operator">×</span>
+        ${location.growthPercent > 0 ? `<span class="npi-roi-mod-growth-percent">(${location.growthPercent}%)</span>` : ''}
+        <span class="npi-roi-mod-math-operator">×</span>
       </td>
-      <td class="col-revenue">
+      <td class="npi-roi-mod-col-revenue">
         $${location.avgRevenue.toLocaleString()}
-        <span class="math-operator">=</span>
+        <span class="npi-roi-mod-math-operator">=</span>
       </td>
-      <td class="col-growth-total growth-total">$${location.growthTotal.toLocaleString()}</td>
+      <td class="npi-roi-mod-col-growth-total npi-roi-mod-growth-total">$${location.growthTotal.toLocaleString()}</td>
     </tr>
   `).join('');
 
@@ -170,11 +170,11 @@ document.addEventListener('DOMContentLoaded', function() {
   updateTable(currentPeriod);
 
   // Tab button click handlers
-  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabButtons = document.querySelectorAll('.npi-roi-mod-tab-btn');
   tabButtons.forEach(btn => {
     btn.addEventListener('click', function() {
       // Remove active class from all buttons
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.npi-roi-mod-tab-btn').forEach(b => b.classList.remove('active'));
       // Add active class to clicked button
       this.classList.add('active');
 
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
     customYearsValue = years;
 
     // Remove active class from all tab buttons
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.npi-roi-mod-tab-btn').forEach(b => b.classList.remove('active'));
 
     // Add active class to select
     customYearsSelect.classList.add('active');
@@ -210,14 +210,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // View toggle handler
   const viewToggle = document.getElementById('viewToggle');
-  const toggleBall = viewToggle.querySelector('.toggle-ball');
+  const toggleBall = viewToggle.querySelector('.npi-roi-mod-toggle-ball');
   const tableView = document.getElementById('tableView');
   const graphView = document.getElementById('graphView');
-  const timePeriodTabs = document.querySelector('.time-period-tabs');
+  const timePeriodTabs = document.querySelector('.npi-roi-mod-time-period-tabs');
   const locationSelectorHeader = document.getElementById('locationSelectorHeader');
   const metricsCards = document.getElementById('metricsCards');
   const footnoteText = document.getElementById('footnoteText');
-  let currentView = 'table';
 
   viewToggle.addEventListener('click', function() {
     const ballIcon = toggleBall.querySelector('i');
@@ -231,10 +230,10 @@ document.addEventListener('DOMContentLoaded', function() {
       if (currentView === 'table') {
         // Switch to graph
         currentView = 'graph';
-        toggleBall.classList.remove('active-table');
-        toggleBall.classList.add('active-graph');
-        viewToggle.classList.remove('active-table');
-        viewToggle.classList.add('active-graph');
+        toggleBall.classList.remove('npi-roi-mod-active-table');
+        toggleBall.classList.add('npi-roi-mod-active-graph');
+        viewToggle.classList.remove('npi-roi-mod-active-table');
+        viewToggle.classList.add('npi-roi-mod-active-graph');
 
         // Update ball content
         toggleBall.innerHTML = '<i class="fas fa-chart-simple"></i><span>Graph</span>';
@@ -255,10 +254,10 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         // Switch to table
         currentView = 'table';
-        toggleBall.classList.remove('active-graph');
-        toggleBall.classList.add('active-table');
-        viewToggle.classList.remove('active-graph');
-        viewToggle.classList.add('active-table');
+        toggleBall.classList.remove('npi-roi-mod-active-graph');
+        toggleBall.classList.add('npi-roi-mod-active-table');
+        viewToggle.classList.remove('npi-roi-mod-active-graph');
+        viewToggle.classList.add('npi-roi-mod-active-table');
 
         // Update ball content
         toggleBall.innerHTML = '<i class="fas fa-table"></i><span>Table</span>';
@@ -293,13 +292,27 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Initialize toggle state
-  viewToggle.classList.add('active-table');
+  viewToggle.classList.add('npi-roi-mod-active-table');
+
+  // Initialize chart when graph view is shown
+  viewToggle.addEventListener('click', function() {
+    setTimeout(() => {
+      if (currentView === 'graph' && !collectionsChart) {
+        initializeChart();
+      }
+    }, 300);
+  });
+
+  // Initialize data selector
+  initializeDataSelector();
+});
 
 // ============================================
 // SIMPLIFIED GRAPH FUNCTIONALITY
 // ============================================
 
 let collectionsChart = null;
+let currentView = 'table'; // Track current view (table or graph)
 let currentMonthlyAverage = 49; // Default current average (will be set from selected location)
 let adjustedMonthlyAverage = 49; // User's adjusted value
 let defaultAdjustedAverage = 49; // Default +10% value (will be set from current average)
@@ -482,13 +495,13 @@ function updateChart(newAdjustedAvg) {
   // Update input styling
   const growthInput = document.getElementById('growthInput');
   if (growthInput) {
-    growthInput.classList.remove('input-neutral', 'input-decrease');
+    growthInput.classList.remove('npi-roi-mod-input-neutral', 'npi-roi-mod-input-decrease');
     if (newAdjustedAvg === currentMonthlyAverage) {
       // No change - gray
-      growthInput.classList.add('input-neutral');
+      growthInput.classList.add('npi-roi-mod-input-neutral');
     } else if (graphData.isDecrease) {
       // Decrease - red
-      growthInput.classList.add('input-decrease');
+      growthInput.classList.add('npi-roi-mod-input-decrease');
     }
     // Else: positive change - default green (no class needed)
   }
@@ -573,7 +586,7 @@ function updateSubtitle(currentAvg, adjustedAvg, yearsElapsed = 1) {
     const article = (percentStr.startsWith('8') || percentStr.startsWith('18')) ? 'an' : 'a';
 
     // Update subtitle
-    const subtitleText = document.querySelector('.graph-subtitle');
+    const subtitleText = document.querySelector('.npi-roi-mod-graph-subtitle');
     if (subtitleText) {
       subtitleText.innerHTML = `<span id="currentAverage">${Math.round(currentAvg)}</span> is the current average. <span id="adjustedAverage">${Math.round(adjustedAvg)}</span> is ${article} <span id="percentChange" style="color: ${changeColor}">${absPercent}%</span> ${changeText}${collectionText}.`;
     }
@@ -592,7 +605,7 @@ function initializeTicker() {
 
   // Position ticker display
   function positionTickerDisplay() {
-    const graphHeader = document.querySelector('.graph-header');
+    const graphHeader = document.querySelector('.npi-roi-mod-graph-header');
     if (graphHeader) {
       const headerHeight = graphHeader.offsetHeight;
       tickerDisplay.style.top = `${headerHeight + 10}px`;
@@ -648,11 +661,11 @@ function initializeTicker() {
     }
 
     // Update ticker display background
-    tickerDisplay.classList.remove('is-member', 'is-projected');
+    tickerDisplay.classList.remove('npi-roi-mod-is-member', 'npi-roi-mod-is-projected');
     if (graphData.isDecrease) {
       tickerDisplay.style.background = 'linear-gradient(135deg, #ffcdd2 0%, #ffebee 100%)';
     } else {
-      tickerDisplay.classList.add('is-member');
+      tickerDisplay.classList.add('npi-roi-mod-is-member');
       tickerDisplay.style.background = '';
     }
 
@@ -744,7 +757,7 @@ if (locationSelect) {
 
     // Update input styling
     if (growthInput) {
-      growthInput.classList.remove('input-neutral', 'input-decrease');
+      growthInput.classList.remove('npi-roi-mod-input-neutral', 'npi-roi-mod-input-decrease');
       // New default is always increase, so no special class
     }
 
@@ -763,12 +776,63 @@ if (locationSelect) {
   });
 }
 
-// Initialize chart when graph view is shown
-viewToggle.addEventListener('click', function() {
-  setTimeout(() => {
-    if (currentView === 'graph' && !collectionsChart) {
-      initializeChart();
-    }
-  }, 300);
-});
-});
+// ============================================
+// DATA SELECTOR FUNCTIONALITY
+// ============================================
+
+// Initialize data selector buttons
+function initializeDataSelector() {
+  const dataSelectorButtons = document.querySelectorAll('.npi-roi-mod-data-selector-btn');
+  if (!dataSelectorButtons.length) return;
+
+  // Check if sampleDataSets is available
+  if (typeof sampleDataSets === 'undefined') {
+    console.warn('Sample data not loaded');
+    return;
+  }
+
+  // Load data for the active button on page load
+  const activeButton = document.querySelector('.npi-roi-mod-data-selector-btn.active');
+  if (activeButton) {
+    const doctorName = activeButton.dataset.doctor;
+    loadDoctorData(doctorName);
+  }
+
+  // Add click handlers to all buttons
+  dataSelectorButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Remove active class from all buttons
+      dataSelectorButtons.forEach(btn => btn.classList.remove('active'));
+
+      // Add active class to clicked button
+      this.classList.add('active');
+
+      // Load selected doctor's data
+      const doctorName = this.dataset.doctor;
+      loadDoctorData(doctorName);
+    });
+  });
+}
+
+// Load data for selected doctor
+function loadDoctorData(doctorName) {
+  if (typeof sampleDataSets === 'undefined' || !sampleDataSets[doctorName]) {
+    console.error('Doctor data not found:', doctorName);
+    return;
+  }
+
+  // Update npData with selected doctor's data
+  npData.locations = sampleDataSets[doctorName].locations;
+  npData.investment = sampleDataSets[doctorName].investment;
+
+  // Recalculate and update the display
+  updateTable(currentPeriod);
+
+  // If graph is visible, reinitialize it with new data
+  if (currentView === 'graph' && collectionsChart) {
+    // Reset chart
+    collectionsChart.destroy();
+    collectionsChart = null;
+    initializeChart();
+  }
+}
