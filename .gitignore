@@ -1,0 +1,8 @@
+# Photoshop files
+*.psd
+
+# macOS files
+.DS_Store
+
+# Temporary files
+*.tmp
